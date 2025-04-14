@@ -14,7 +14,7 @@ affects_non_octopusdeploy_resources if {
     not startswith(resource_change.type, "octopusdeploy_")
 }
 
-# This is the rule we wan to check
+# This is the combined rule we want to check
 allow if {
 	not affects_non_octopusdeploy_resources
 }
