@@ -258,6 +258,7 @@ func createTerraformRcFile() error {
     path    = "/usr/share/terraform/providers"
     include = ["*/*/*"]
   }
+  direct {}
 }`
 
 	homeDir, err := os.UserHomeDir()
@@ -274,7 +275,6 @@ func createTerraformRcFile() error {
 		if err := os.Rename(rcFilePath, backupPath); err != nil {
 			return fmt.Errorf("failed to backup existing .terraformrc file: %w", err)
 		}
-		zap.L().Info("Backed up existing .terraformrc file", zap.String("backup_path", backupPath))
 	} else if !os.IsNotExist(err) {
 		return fmt.Errorf("failed to check if .terraformrc file exists: %w", err)
 	}
@@ -284,6 +284,5 @@ func createTerraformRcFile() error {
 		return fmt.Errorf("failed to write .terraformrc file: %w", err)
 	}
 
-	zap.L().Info("Created .terraformrc file", zap.String("path", rcFilePath))
 	return nil
 }
