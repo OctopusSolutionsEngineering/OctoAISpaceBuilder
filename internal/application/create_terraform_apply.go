@@ -11,6 +11,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -84,6 +85,7 @@ func CreateTerraformApply(c *gin.Context) {
 	stdout, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
+			"-chdir=" + tempDir,
 			"apply",
 			"-auto-approve",
 			"-input=false",
@@ -98,5 +100,19 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusCreated, stdout)
+	response := model.TerraformApply{
+		ID:        uuid.New().String(),
+		PlanId:    terraform.PlanId,
+		Server:    terraform.Server,
+		ApplyText: &stdout,
+	}
+
+	responseJSON, err := jsonapi.Marshal(response)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	c.String(http.StatusCreated, string(responseJSON))
 }

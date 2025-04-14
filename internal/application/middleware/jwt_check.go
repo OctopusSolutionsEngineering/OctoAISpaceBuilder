@@ -32,6 +32,12 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 			return
 		}
 
+		// Don't try to validate the token with an API call
+		if skipValidation {
+			c.Next()
+			return
+		}
+
 		// Use the token to look up the user. This is not foolproof - you could supply any valid JWT token
 		// with an audience claim that points to a server that responds to this API request.
 		// We can't prove that anyone submitting feedback is a genuine Octopus user.
