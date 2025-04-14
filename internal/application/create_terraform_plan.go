@@ -278,6 +278,19 @@ func createTerraformRcFile() error {
 	rcFilePath := filepath.Join(homeDir, ".terraformrc")
 
 	// Check if file already exists
+	if err := backupRcFile(rcFilePath); err != nil {
+		return err
+	}
+
+	// Write the new content
+	if err := os.WriteFile(rcFilePath, []byte(content), 0600); err != nil {
+		return fmt.Errorf("failed to write .terraformrc file: %w", err)
+	}
+
+	return nil
+}
+
+func backupRcFile(rcFilePath string) error {
 	if _, err := os.Stat(rcFilePath); err == nil {
 		// Back up existing file
 		backupPath := rcFilePath + ".backup." + time.Now().Format("20060102150405")
@@ -286,11 +299,6 @@ func createTerraformRcFile() error {
 		}
 	} else if !os.IsNotExist(err) {
 		return fmt.Errorf("failed to check if .terraformrc file exists: %w", err)
-	}
-
-	// Write the new content
-	if err := os.WriteFile(rcFilePath, []byte(content), 0600); err != nil {
-		return fmt.Errorf("failed to write .terraformrc file: %w", err)
 	}
 
 	return nil
