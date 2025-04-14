@@ -2,6 +2,8 @@ package application
 
 import (
 	"encoding/base64"
+	"errors"
+	"fmt"
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
@@ -58,26 +60,7 @@ func CreateTerraformPlan(c *gin.Context) {
 
 	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
-	planFile := filepath.Join(tempDir, "tfplan")
-
-	_, _, err = execute.Execute(
-		"binaries/tofu",
-		[]string{
-			"-chdir=" + tempDir,
-			"plan",
-			"-no-color",
-			"-out",
-			planFile},
-		map[string]string{
-			"TF_VAR_access_token": token,
-		})
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
-		return
-	}
-
-	plan, err := os.ReadFile(planFile)
+	planFile, planBinary, err := generatePlan(tempDir, token)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
@@ -91,8 +74,6 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	planBinary := base64.StdEncoding.EncodeToString(plan)
-
 	terraformPlan := model.TerraformPlan{
 		ID:               uuid.New().String(),
 		PlanBinaryBase64: &planBinary,
@@ -105,14 +86,19 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	planStdOut, _, err := execute.Execute(
-		"binaries/tofu",
-		[]string{
-			"-chdir=" + tempDir,
-			"show",
-			"-no-color",
-			planFile},
-		map[string]string{})
+	planJson, err := generatePlanJson(planFile)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	if err := checkPlan(planJson); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	planText, err := generatePlanText(planFile)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
@@ -121,7 +107,7 @@ func CreateTerraformPlan(c *gin.Context) {
 
 	response := model.TerraformPlan{
 		ID:       terraformPlan.ID,
-		PlanText: &planStdOut,
+		PlanText: &planText,
 		Created:  terraformPlan.Created,
 		Server:   terraformPlan.Server,
 	}
@@ -134,4 +120,107 @@ func CreateTerraformPlan(c *gin.Context) {
 	}
 
 	c.String(http.StatusCreated, string(responseJSON))
+}
+
+func generatePlan(tempDir string, token string) (string, string, error) {
+	planFile := filepath.Join(tempDir, "tfplan")
+
+	_, stdErr, _, err := execute.Execute(
+		"binaries/tofu",
+		[]string{
+			"-chdir=" + tempDir,
+			"plan",
+			"-no-color",
+			"-out",
+			planFile},
+		map[string]string{
+			"TF_VAR_access_token": token,
+		})
+
+	if err != nil {
+		return "", "", errors.New("Failed to generate plan: " + stdErr)
+	}
+
+	plan, err := os.ReadFile(planFile)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	return planFile, base64.StdEncoding.EncodeToString(plan), nil
+}
+
+func generatePlanJson(planFile string) (string, error) {
+	planJsonStdOut, _, _, err := execute.Execute(
+		"binaries/tofu",
+		[]string{
+			"show",
+			"-json",
+			"-no-color",
+			planFile},
+		map[string]string{})
+
+	if err != nil {
+		return "", nil
+	}
+
+	return planJsonStdOut, nil
+}
+
+func generatePlanText(planFile string) (string, error) {
+	planStdOut, _, _, err := execute.Execute(
+		"binaries/tofu",
+		[]string{
+			"show",
+			"-no-color",
+			planFile},
+		map[string]string{})
+
+	if err != nil {
+		return "", nil
+	}
+
+	return planStdOut, nil
+}
+
+func checkPlan(planJson string) error {
+	tempDir, err := files.CreateTempDir()
+
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			zap.L().Error("Failed to remove temporary directory", zap.Error(err))
+		}
+	}()
+
+	if err := os.WriteFile(filepath.Join(tempDir, "plan.json"), []byte(planJson), 0644); err != nil {
+		return err
+	}
+
+	checkStdOut, _, exitCode, err := execute.Execute(
+		"binaries/opa_linux_amd64",
+		[]string{
+			"exec",
+			"--fail",
+			"--decision",
+			"terraform/analysis/allow",
+			"--bundle",
+			"policy/",
+			filepath.Join(tempDir, "plan.json")},
+		map[string]string{})
+
+	if err != nil {
+		return err
+	}
+
+	if exitCode != 0 {
+		return fmt.Errorf("OPA check failed with exit code %d: %s", exitCode, checkStdOut)
+	}
+
+	zap.L().Info(checkStdOut)
+
+	return nil
 }

@@ -82,7 +82,7 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	stdout, _, err := execute.Execute(
+	stdout, _, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"-chdir=" + tempDir,

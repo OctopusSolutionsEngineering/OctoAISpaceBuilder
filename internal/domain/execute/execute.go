@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"syscall"
 )
 
-func Execute(executable string, args []string, env map[string]string) (string, string, error) {
+func Execute(executable string, args []string, env map[string]string) (string, string, int, error) {
 	cmd := exec.Command(executable, args...)
 
 	// Set environment variables if provided
@@ -21,9 +22,19 @@ func Execute(executable string, args []string, env map[string]string) (string, s
 	cmd.Stderr = &stderr
 
 	err := cmd.Run()
+
+	// Default exit code
+	exitCode := 0
+
 	if err != nil {
-		return "", "", fmt.Errorf("execution failed: %v, stderr: %s", err, stderr.String())
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// Get the exit code from the wait status
+			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
+				exitCode = status.ExitStatus()
+			}
+		}
+		return stdout.String(), stderr.String(), exitCode, err
 	}
 
-	return stdout.String(), stderr.String(), nil
+	return stdout.String(), stderr.String(), exitCode, nil
 }
