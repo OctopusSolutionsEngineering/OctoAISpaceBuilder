@@ -264,7 +264,7 @@ func createTerraformRcFile() error {
 
 	content := `provider_installation {
   filesystem_mirror {
-    path    = "` + currentDir + `/providers"
+    path    = "` + currentDir + `/provider"
     include = ["*/*/*"]
   }
   direct {}
