@@ -40,7 +40,7 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.
 	lockFileName := filepath.Join(tempDir, ".terraform.lock.hcl")
 	configurationFileName := filepath.Join(tempDir, "terraform.tf")
 
-	planContents, spaceId, lockFile, configuration, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
+	planContents, _, lockFile, configuration, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
 
 	if err != nil {
 		return nil, err
@@ -80,8 +80,7 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.
 			"-chdir=" + tempDir,
 			"init",
 			"-input=false",
-			"-no-color",
-			"-var=octopus_space_id=" + spaceId},
+			"-no-color"},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
 			"OCTOPUS_URL":          aud,
