@@ -253,9 +253,15 @@ func checkPlan(planJson string) error {
 }
 
 func createTerraformRcFile() error {
+	currentDir, err := os.Getwd()
+
+	if err != nil {
+		return fmt.Errorf("failed to determine current working directory: %w", err)
+	}
+
 	content := `provider_installation {
   filesystem_mirror {
-    path    = "/usr/share/terraform/providers"
+    path    = "` + currentDir + `/providers"
     include = ["*/*/*"]
   }
   direct {}
