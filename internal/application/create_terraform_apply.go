@@ -1,25 +1,27 @@
 package application
 
 import (
+	"encoding/base64"
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-func CreateTerraform(c *gin.Context) {
+func CreateTerraformApply(c *gin.Context) {
+
+	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
 	body, err := io.ReadAll(c.Request.Body)
 
@@ -28,13 +30,22 @@ func CreateTerraform(c *gin.Context) {
 		return
 	}
 
-	var terraform model.Terraform
+	var terraform model.TerraformApply
 	err = jsonapi.Unmarshal(body, &terraform)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
 		return
 	}
+
+	aud, err := jwt.GetJwtAud(token)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	terraform.Server = sha.GetSha256Hash(aud)
 
 	tempDir, err := files.CreateTempDir()
 
@@ -49,22 +60,34 @@ func CreateTerraform(c *gin.Context) {
 		}
 	}()
 
-	if err := os.WriteFile(filepath.Join(tempDir, "terraform.tf"), []byte(terraform.Configuration), 0644); err != nil {
+	planFile := filepath.Join(tempDir, "tfplan")
+
+	planContents, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
+
+	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
 
-	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+	decoded, err := base64.StdEncoding.DecodeString(planContents)
 
-	planFile := filepath.Join(tempDir, "plan.json")
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
 
-	_, _, err = execute.Execute(
+	if err := os.WriteFile(planFile, decoded, 0644); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	stdout, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
-			"-chdir=" + tempDir,
-			"plan",
+			"apply",
+			"-auto-approve",
+			"-input=false",
 			"-no-color",
-			"-out",
 			planFile},
 		map[string]string{
 			"TF_VAR_access_token": token,
@@ -75,45 +98,5 @@ func CreateTerraform(c *gin.Context) {
 		return
 	}
 
-	plan, err := os.ReadFile(planFile)
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
-		return
-	}
-
-	aud, err := jwt.GetJwtAud(token)
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
-		return
-	}
-
-	terraformPlan := model.TerraformPlan{
-		ID:      uuid.New().String(),
-		Plan:    string(plan),
-		Created: time.Now(),
-		Server:  aud,
-	}
-
-	if err := infrastructure.CreateFeedbackAzureStorageTable(terraformPlan); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
-		return
-	}
-
-	planStdOut, _, err := execute.Execute(
-		"binaries/tofu",
-		[]string{
-			"-chdir=" + tempDir,
-			"show",
-			"-no-color",
-			planFile},
-		map[string]string{})
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
-		return
-	}
-
-	c.String(http.StatusCreated, planStdOut)
+	c.String(http.StatusCreated, stdout)
 }

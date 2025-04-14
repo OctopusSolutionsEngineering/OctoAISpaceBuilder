@@ -11,8 +11,8 @@ func ValidateTerraformPlan(plan model.TerraformPlan) error {
 		return errors.New("id is required")
 	}
 
-	if strings.TrimSpace(plan.Plan) == "" {
-		return errors.New("plan is required")
+	if plan.PlanBinaryBase64 == nil || strings.TrimSpace(*plan.PlanBinaryBase64) == "" {
+		return errors.New("plan_binary is required")
 	}
 
 	return nil

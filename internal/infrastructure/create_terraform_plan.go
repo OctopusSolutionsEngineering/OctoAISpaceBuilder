@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/Azure/azure-sdk-for-go/sdk/data/aztables"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/validation"
 )
 
@@ -31,11 +30,11 @@ func CreateFeedbackAzureStorageTable(plan model.TerraformPlan) error {
 
 	myEntity := aztables.EDMEntity{
 		Entity: aztables.Entity{
-			PartitionKey: sha.GetSha256Hash(plan.Server),
+			PartitionKey: plan.Server,
 			RowKey:       plan.ID,
 		},
 		Properties: map[string]any{
-			"Plan": plan.Plan,
+			"PlanBinary": plan.PlanBinaryBase64,
 		},
 	}
 	marshalled, err := json.Marshal(myEntity)
