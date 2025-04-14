@@ -60,6 +60,16 @@ func CreateTerraformPlan(c *gin.Context) {
 
 	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
+	if err := createTerraformRcFile(); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	if err := initTofu(tempDir); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
 	planFile, planBinary, err := generatePlan(tempDir, token)
 
 	if err != nil {
@@ -120,6 +130,23 @@ func CreateTerraformPlan(c *gin.Context) {
 	}
 
 	c.String(http.StatusCreated, string(responseJSON))
+}
+
+func initTofu(tempDir string) error {
+	_, stdErr, _, err := execute.Execute(
+		"binaries/tofu",
+		[]string{
+			"-chdir=" + tempDir,
+			"init",
+			"-input=false",
+			"-no-color"},
+		map[string]string{})
+
+	if err != nil {
+		return errors.New("Failed to init: " + stdErr)
+	}
+
+	return nil
 }
 
 func generatePlan(tempDir string, token string) (string, string, error) {
@@ -222,5 +249,41 @@ func checkPlan(planJson string) error {
 
 	zap.L().Info(checkStdOut)
 
+	return nil
+}
+
+func createTerraformRcFile() error {
+	content := `provider_installation {
+  filesystem_mirror {
+    path    = "/usr/share/terraform/providers"
+    include = ["*/*/*"]
+  }
+}`
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to determine user home directory: %w", err)
+	}
+
+	rcFilePath := filepath.Join(homeDir, ".terraformrc")
+
+	// Check if file already exists
+	if _, err := os.Stat(rcFilePath); err == nil {
+		// Back up existing file
+		backupPath := rcFilePath + ".backup." + time.Now().Format("20060102150405")
+		if err := os.Rename(rcFilePath, backupPath); err != nil {
+			return fmt.Errorf("failed to backup existing .terraformrc file: %w", err)
+		}
+		zap.L().Info("Backed up existing .terraformrc file", zap.String("backup_path", backupPath))
+	} else if !os.IsNotExist(err) {
+		return fmt.Errorf("failed to check if .terraformrc file exists: %w", err)
+	}
+
+	// Write the new content
+	if err := os.WriteFile(rcFilePath, []byte(content), 0600); err != nil {
+		return fmt.Errorf("failed to write .terraformrc file: %w", err)
+	}
+
+	zap.L().Info("Created .terraformrc file", zap.String("path", rcFilePath))
 	return nil
 }
