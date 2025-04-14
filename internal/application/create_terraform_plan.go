@@ -72,7 +72,9 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	if err := initTofu(tempDir); err != nil {
+	lockFile, err := initTofu(tempDir)
+
+	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
@@ -91,7 +93,7 @@ func CreateTerraformPlan(c *gin.Context) {
 		SpaceId: terraformInput.SpaceId,
 	}
 
-	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server); err != nil {
+	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
@@ -127,7 +129,7 @@ func CreateTerraformPlan(c *gin.Context) {
 	c.String(http.StatusCreated, string(responseJSON))
 }
 
-func initTofu(tempDir string) error {
+func initTofu(tempDir string) (string, error) {
 	_, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
@@ -138,10 +140,16 @@ func initTofu(tempDir string) error {
 		map[string]string{})
 
 	if err != nil {
-		return errors.New("Failed to init: " + stdErr)
+		return "", errors.New("Failed to init: " + stdErr)
 	}
 
-	return nil
+	lockFile, err := os.ReadFile(filepath.Join(tempDir, ".terraform.lock.hcl"))
+
+	if err != nil {
+		return "", errors.New("Failed to get lock file: " + stdErr)
+	}
+
+	return base64.StdEncoding.EncodeToString(lockFile), nil
 }
 
 func generatePlan(tempDir string, token string, aud string, spaceId string) (string, string, error) {
