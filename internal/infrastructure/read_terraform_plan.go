@@ -8,17 +8,17 @@ import (
 	"golang.org/x/net/context"
 )
 
-func ReadFeedbackAzureStorageTable(terraformApply model.TerraformApply) (string, error) {
+func ReadFeedbackAzureStorageTable(terraformApply model.TerraformApply) (string, string, error) {
 	service, err := aztables.NewServiceClientFromConnectionString(GetStorageConnectionString(), nil)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	ctx := context.Background()
 
 	if err := CreateTable(service, ctx); err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	client := service.NewClient("TerraformPlan")
@@ -26,20 +26,32 @@ func ReadFeedbackAzureStorageTable(terraformApply model.TerraformApply) (string,
 	resp, err := client.GetEntity(ctx, terraformApply.Server, terraformApply.PlanId, nil)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	var entity aztables.EDMEntity
 	err = json.Unmarshal(resp.Value, &entity)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
+	planBinary := ""
 	if value, ok := entity.Properties["PlanBinary"]; ok {
 		if value, ok := value.(string); ok {
-			return value, nil
+			planBinary = value
 		}
 	}
 
-	return "", errors.New("could not find PlanJson in entity properties")
+	spaceId := ""
+	if value, ok := entity.Properties["SpaceId"]; ok {
+		if value, ok := value.(string); ok {
+			spaceId = value
+		}
+	}
+
+	if planBinary != "" && spaceId != "" {
+		return planBinary, spaceId, nil
+	}
+
+	return "", "", errors.New("could not find PlanJson or SpaceId in entity properties")
 }

@@ -4,16 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Azure/azure-sdk-for-go/sdk/data/aztables"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/validation"
 )
 
 // https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/data/aztables
-func CreateFeedbackAzureStorageTable(plan model.TerraformPlan) error {
-	if err := validation.ValidateTerraformPlan(plan); err != nil {
-		return err
-	}
-
+func CreateFeedbackAzureStorageTable(id string, planBinary string, spaceId string, server string) error {
 	service, err := aztables.NewServiceClientFromConnectionString(GetStorageConnectionString(), nil)
 
 	if err != nil {
@@ -30,11 +24,12 @@ func CreateFeedbackAzureStorageTable(plan model.TerraformPlan) error {
 
 	myEntity := aztables.EDMEntity{
 		Entity: aztables.Entity{
-			PartitionKey: plan.Server,
-			RowKey:       plan.ID,
+			PartitionKey: server,
+			RowKey:       id,
 		},
 		Properties: map[string]any{
-			"PlanBinary": plan.PlanBinaryBase64,
+			"PlanBinary": planBinary,
+			"SpaceId":    spaceId,
 		},
 	}
 	marshalled, err := json.Marshal(myEntity)

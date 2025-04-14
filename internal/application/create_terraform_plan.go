@@ -32,8 +32,8 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	var terraform model.Terraform
-	err = jsonapi.Unmarshal(body, &terraform)
+	var terraformInput model.TerraformPlan
+	err = jsonapi.Unmarshal(body, &terraformInput)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
@@ -53,12 +53,19 @@ func CreateTerraformPlan(c *gin.Context) {
 		}
 	}()
 
-	if err := os.WriteFile(filepath.Join(tempDir, "terraform.tf"), []byte(terraform.Configuration), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tempDir, "terraformInput.tf"), []byte(terraformInput.Configuration), 0644); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
 
 	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+
+	aud, err := jwt.GetJwtAud(token)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
 
 	if err := createTerraformRcFile(); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
@@ -70,28 +77,21 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	planFile, planBinary, err := generatePlan(tempDir, token)
+	planFile, planBinary, err := generatePlan(tempDir, token, aud, terraformInput.SpaceId)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
 
-	aud, err := jwt.GetJwtAud(token)
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
-		return
+	response := model.TerraformPlan{
+		ID:      uuid.New().String(),
+		Created: time.Now(),
+		Server:  sha.GetSha256Hash(aud),
+		SpaceId: terraformInput.SpaceId,
 	}
 
-	terraformPlan := model.TerraformPlan{
-		ID:               uuid.New().String(),
-		PlanBinaryBase64: &planBinary,
-		Created:          time.Now(),
-		Server:           sha.GetSha256Hash(aud),
-	}
-
-	if err := infrastructure.CreateFeedbackAzureStorageTable(terraformPlan); err != nil {
+	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
@@ -115,12 +115,7 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	response := model.TerraformPlan{
-		ID:       terraformPlan.ID,
-		PlanText: &planText,
-		Created:  terraformPlan.Created,
-		Server:   terraformPlan.Server,
-	}
+	response.PlanText = &planText
 
 	responseJSON, err := jsonapi.Marshal(response)
 
@@ -149,7 +144,7 @@ func initTofu(tempDir string) error {
 	return nil
 }
 
-func generatePlan(tempDir string, token string) (string, string, error) {
+func generatePlan(tempDir string, token string, aud string, spaceId string) (string, string, error) {
 	planFile := filepath.Join(tempDir, "tfplan")
 
 	_, stdErr, _, err := execute.Execute(
@@ -159,9 +154,11 @@ func generatePlan(tempDir string, token string) (string, string, error) {
 			"plan",
 			"-no-color",
 			"-out",
-			planFile},
+			planFile,
+			"-var=octopus_space_id=" + spaceId},
 		map[string]string{
-			"TF_VAR_access_token": token,
+			"OCTOPUS_ACCESS_TOKEN": token,
+			"OCTOPUS_URL":          aud,
 		})
 
 	if err != nil {

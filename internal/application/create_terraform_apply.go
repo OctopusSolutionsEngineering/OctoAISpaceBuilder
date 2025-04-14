@@ -63,7 +63,7 @@ func CreateTerraformApply(c *gin.Context) {
 
 	planFile := filepath.Join(tempDir, "tfplan")
 
-	planContents, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
+	planContents, spaceId, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
@@ -90,9 +90,11 @@ func CreateTerraformApply(c *gin.Context) {
 			"-auto-approve",
 			"-input=false",
 			"-no-color",
-			planFile},
+			planFile,
+			"-var=octopus_space_id=" + spaceId},
 		map[string]string{
-			"TF_VAR_access_token": token,
+			"OCTOPUS_ACCESS_TOKEN": token,
+			"OCTOPUS_URL":          aud,
 		})
 
 	if err != nil {
