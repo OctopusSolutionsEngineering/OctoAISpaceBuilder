@@ -7,7 +7,7 @@ import (
 )
 
 // https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/data/aztables
-func CreateFeedbackAzureStorageTable(id string, planBinary string, spaceId string, server string, lockFile string) error {
+func CreateFeedbackAzureStorageTable(id string, planBinary string, spaceId string, server string, lockFile string, configuration string) error {
 	service, err := aztables.NewServiceClientFromConnectionString(GetStorageConnectionString(), nil)
 
 	if err != nil {
@@ -28,9 +28,10 @@ func CreateFeedbackAzureStorageTable(id string, planBinary string, spaceId strin
 			RowKey:       id,
 		},
 		Properties: map[string]any{
-			"PlanBinary": planBinary,
-			"SpaceId":    spaceId,
-			"LockFile":   lockFile,
+			"PlanBinary":    planBinary,
+			"SpaceId":       spaceId,
+			"LockFile":      lockFile,
+			"Configuration": configuration,
 		},
 	}
 	marshalled, err := json.Marshal(myEntity)

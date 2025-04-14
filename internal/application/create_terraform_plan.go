@@ -93,7 +93,7 @@ func CreateTerraformPlan(c *gin.Context) {
 		SpaceId: terraformInput.SpaceId,
 	}
 
-	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile); err != nil {
+	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile, terraformInput.Configuration); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}

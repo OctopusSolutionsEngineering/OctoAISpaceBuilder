@@ -64,8 +64,9 @@ func CreateTerraformApply(c *gin.Context) {
 
 	planFile := filepath.Join(tempDir, "tfplan")
 	lockFileName := filepath.Join(tempDir, ".terraform.lock.hcl")
+	configurationFileName := filepath.Join(tempDir, "terraform.tf")
 
-	planContents, spaceId, lockFile, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
+	planContents, spaceId, lockFile, configuration, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
@@ -92,6 +93,16 @@ func CreateTerraformApply(c *gin.Context) {
 	}
 
 	if err := os.WriteFile(lockFileName, decodedLockFile, 0644); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	if err := os.WriteFile(lockFileName, decodedLockFile, 0644); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	if err := os.WriteFile(configurationFileName, []byte(configuration), 0644); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
