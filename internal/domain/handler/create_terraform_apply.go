@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/base64"
-	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
@@ -15,12 +14,12 @@ import (
 	"path/filepath"
 )
 
-func CreateTerraformApply(token string, terraform model.TerraformApply) (string, error) {
+func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.TerraformApply, error) {
 
 	aud, err := jwt.GetJwtAud(token)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	terraform.Server = sha.GetSha256Hash(aud)
@@ -28,7 +27,7 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (string,
 	tempDir, err := files.CreateTempDir()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer func() {
@@ -44,35 +43,35 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (string,
 	planContents, spaceId, lockFile, configuration, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	decoded, err := base64.StdEncoding.DecodeString(planContents)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	decodedLockFile, err := base64.StdEncoding.DecodeString(lockFile)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if err := os.WriteFile(planFile, decoded, 0644); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if err := os.WriteFile(lockFileName, decodedLockFile, 0644); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if err := os.WriteFile(lockFileName, decodedLockFile, 0644); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if err := os.WriteFile(configurationFileName, []byte(configuration), 0644); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	_, _, _, err = execute.Execute(
@@ -89,7 +88,7 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (string,
 		})
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	stdout, _, _, err := execute.Execute(
@@ -107,7 +106,7 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (string,
 		})
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	response := model.TerraformApply{
@@ -117,11 +116,5 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (string,
 		ApplyText: &stdout,
 	}
 
-	responseJSON, err := jsonapi.Marshal(response)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(responseJSON), err
+	return &response, nil
 }

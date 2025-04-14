@@ -37,5 +37,12 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusCreated, response)
+	responseJSON, err := jsonapi.Marshal(response)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	c.String(http.StatusCreated, string(responseJSON))
 }

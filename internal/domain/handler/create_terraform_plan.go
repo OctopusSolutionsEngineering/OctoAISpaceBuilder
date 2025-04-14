@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
@@ -18,12 +17,12 @@ import (
 	"time"
 )
 
-func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (string, error) {
+func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
 
 	tempDir, err := files.CreateTempDir()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer func() {
@@ -33,29 +32,29 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (stri
 	}()
 
 	if err := os.WriteFile(filepath.Join(tempDir, "terraformInput.tf"), []byte(terraformInput.Configuration), 0644); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	aud, err := jwt.GetJwtAud(token)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if err := createTerraformRcFile(); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	lockFile, err := initTofu(tempDir)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	planFile, planBinary, err := generatePlan(tempDir, token, aud, terraformInput.SpaceId)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	response := model.TerraformPlan{
@@ -66,34 +65,28 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (stri
 	}
 
 	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile, terraformInput.Configuration); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	planJson, err := generatePlanJson(planFile)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if err := checkPlan(planJson); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	planText, err := generatePlanText(planFile)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	response.PlanText = &planText
 
-	responseJSON, err := jsonapi.Marshal(response)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(responseJSON), nil
+	return &response, nil
 }
 
 func initTofu(tempDir string) (string, error) {
