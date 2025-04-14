@@ -2,6 +2,7 @@ package application
 
 import (
 	"encoding/base64"
+	"fmt"
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
@@ -82,15 +83,13 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	stdout, _, _, err := execute.Execute(
+	_, _, _, err = execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"-chdir=" + tempDir,
-			"apply",
-			"-auto-approve",
+			"init",
 			"-input=false",
 			"-no-color",
-			planFile,
 			"-var=octopus_space_id=" + spaceId},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
@@ -99,6 +98,25 @@ func CreateTerraformApply(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	stdout, stderr, _, err := execute.Execute(
+		"binaries/tofu",
+		[]string{
+			"-chdir=" + tempDir,
+			"apply",
+			"-auto-approve",
+			"-input=false",
+			"-no-color",
+			planFile},
+		map[string]string{
+			"OCTOPUS_ACCESS_TOKEN": token,
+			"OCTOPUS_URL":          aud,
+		})
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError(fmt.Sprintf("Failed to process request: %s", stderr), err))
 		return
 	}
 
