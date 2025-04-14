@@ -22,6 +22,9 @@ func CreateFeedbackAzureStorageTable(id string, planBinary string, spaceId strin
 
 	client := service.NewClient("TerraformPlan")
 
+	// We need to save enough of the terraform configuration to be able to recreate the plan
+	// on a new function instance.
+	// https://developer.hashicorp.com/terraform/tutorials/automation/automate-terraform#plan-and-apply-on-different-machines
 	myEntity := aztables.EDMEntity{
 		Entity: aztables.Entity{
 			PartitionKey: server,
