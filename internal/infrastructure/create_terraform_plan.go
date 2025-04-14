@@ -27,7 +27,7 @@ func CreateFeedbackAzureStorageTable(plan model.TerraformPlan) error {
 		return err
 	}
 
-	client := service.NewClient("Feedback")
+	client := service.NewClient("TerraformPlan")
 
 	myEntity := aztables.EDMEntity{
 		Entity: aztables.Entity{
