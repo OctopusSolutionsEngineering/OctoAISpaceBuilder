@@ -14,7 +14,7 @@
   },
   "customHandler": {
     "description": {
-      "defaultExecutablePath": "feedback_linux_amd64_azure",
+      "defaultExecutablePath": "spacebuilder_linux_amd64_azure",
       "workingDirectory": "",
       "arguments": []
     },
