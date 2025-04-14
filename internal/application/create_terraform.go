@@ -58,7 +58,7 @@ func CreateTerraform(c *gin.Context) {
 
 	planFile := filepath.Join(tempDir, "plan.json")
 
-	stdout, _, err := execute.Execute(
+	_, _, err = execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"-chdir=" + tempDir,
@@ -101,5 +101,19 @@ func CreateTerraform(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusCreated, stdout)
+	planStdOut, _, err := execute.Execute(
+		"binaries/tofu",
+		[]string{
+			"-chdir=" + tempDir,
+			"show",
+			"-no-color",
+			planFile},
+		map[string]string{})
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	c.String(http.StatusCreated, planStdOut)
 }
