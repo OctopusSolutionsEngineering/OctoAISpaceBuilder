@@ -37,5 +37,10 @@ step "remove-worker-access" {
             Octopus.Action.Template.Version = "0"
         }
         worker_pool = "hosted-ubuntu"
+
+        container {
+            feed = "docker-hub"
+            image = "octopuslabs/azure-workertools"
+        }
     }
 }
