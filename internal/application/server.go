@@ -9,8 +9,8 @@ import (
 func StartServer() error {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-	router.POST("/api/terraformplan", middleware.JwtCheckMiddleware(environment.DisableValidation()), CreateTerraformPlan)
-	router.POST("/api/terraformapply", middleware.JwtCheckMiddleware(environment.DisableValidation()), CreateTerraformApply)
+	router.POST("/api/terraformplan", middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformPlan)
+	router.POST("/api/terraformapply", middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformApply)
 	router.GET("/api/health", Health)
 
 	return router.Run("localhost:" + environment.GetPort())

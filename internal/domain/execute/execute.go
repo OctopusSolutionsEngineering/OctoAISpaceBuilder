@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"syscall"
 )
 
 func Execute(executable string, args []string, env map[string]string) (string, string, int, error) {
-	if err := makeExecutable(executable); err != nil {
-		return "", "", 0, err
-	}
-
 	cmd := exec.Command(executable, args...)
 
 	// Set environment variables if provided
@@ -44,7 +41,7 @@ func Execute(executable string, args []string, env map[string]string) (string, s
 	return stdout.String(), stderr.String(), exitCode, nil
 }
 
-func makeExecutable(executable string) error {
+func MakeExecutable(executable string) error {
 	info, err := os.Stat(executable)
 	if err != nil {
 		return fmt.Errorf("failed to stat %s: %w", executable, err)
@@ -52,4 +49,26 @@ func makeExecutable(executable string) error {
 
 	// Add execute permission to current permissions
 	return os.Chmod(executable, info.Mode()|0111)
+}
+
+func MakeAllExecutable(directory string) error {
+	return filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip directories
+		if info.IsDir() {
+			return nil
+		}
+
+		// Check if file has execute bit for any user
+		if info.Mode()&0111 == 0 {
+			if err := MakeExecutable(path); err != nil {
+				return fmt.Errorf("failed to make %s executable: %w", path, err)
+			}
+		}
+
+		return nil
+	})
 }
