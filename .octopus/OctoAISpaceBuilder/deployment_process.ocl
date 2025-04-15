@@ -9,6 +9,11 @@ step "deploy-with-cli" {
         }
         worker_pool = "hosted-ubuntu"
 
+        container {
+            feed = "docker-hub"
+            image = "octopuslabs/azure-workertools"
+        }
+
         packages "Packages.FunctionApp" {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
