@@ -22,3 +22,15 @@ step "deploy-with-cli" {
         }
     }
 }
+
+step "remove-worker-access" {
+    name = "Remove worker access"
+
+    action {
+        properties = {
+            Octopus.Action.Template.Id = "ActionTemplates-4322"
+            Octopus.Action.Template.Version = "0"
+        }
+        worker_pool = "hosted-ubuntu"
+    }
+}
