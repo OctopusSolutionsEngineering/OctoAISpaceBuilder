@@ -27,6 +27,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Login to Octopus Deploy
+        uses: OctopusDeploy/login@v1
+        with:
+          server: https://mattc.octopus.app
+          service_account_id: 55561b45-c3e3-4e5c-83c9-353dab4a5360
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -78,7 +83,7 @@ jobs:
         run: |
           curl -L -o tofu.tar.gz https://github.com/opentofu/opentofu/releases/download/v1.9.0/tofu_1.9.0_linux_amd64.tar.gz
           tar -xzf tofu.tar.gz -C functions/binaries
-          curl -L -o binaries/opa_linux_amd64 https://github.com/open-policy-agent/opa/releases/download/v1.3.0/opa_linux_amd64
+          curl -L -o functions/binaries/opa_linux_amd64 https://github.com/open-policy-agent/opa/releases/download/v1.3.0/opa_linux_amd64
           chmod +x functions/binaries/opa_linux_amd64
           curl -L -o terraform-provider-octopusdeploy.zip https://github.com/OctopusDeployLabs/terraform-provider-octopusdeploy/releases/download/v0.42.0/terraform-provider-octopusdeploy_0.42.0_linux_amd64.zip
           unzip terraform-provider-octopusdeploy.zip -d functions/provider/registry.opentofu.org/octopusdeploylabs/octopusdeploy/0.42.0/linux_amd64
@@ -104,9 +109,8 @@ jobs:
         if: ${{ steps.branch-name.outputs.current_branch == 'main' }}
         uses: OctopusDeploy/push-package-action@v3
         env:
-          OCTOPUS_API_KEY: ${{ secrets.COPILOT_OCTOPUS_API }}
-          OCTOPUS_URL: ${{ secrets.COPILOT_OCTOPUS_URL }}
-          OCTOPUS_SPACE: ${{ secrets.COPILOT_OCTOPUS_SPACE }}
+          OCTOPUS_URL: https://mattc.octopus.app
+          OCTOPUS_SPACE: "Octopus Copilot"
         with:
           packages: functions/octoterra_azure.${{ steps.determine_version.outputs.semVer }}.zip
           overwrite_mode: OverwriteExisting
@@ -114,9 +118,8 @@ jobs:
         if: ${{ steps.branch-name.outputs.current_branch == 'main' }}
         uses: OctopusDeploy/create-release-action@v3
         env:
-          OCTOPUS_API_KEY: ${{ secrets.COPILOT_OCTOPUS_API }}
-          OCTOPUS_URL: ${{ secrets.COPILOT_OCTOPUS_URL }}
-          OCTOPUS_SPACE: ${{ secrets.COPILOT_OCTOPUS_SPACE }}
+          OCTOPUS_URL: https://mattc.octopus.app
+          OCTOPUS_SPACE: "Octopus Copilot"
         with:
           project: Octopus SpaceBuilder Function
           packages: octoterra_azure:${{ steps.determine_version.outputs.semVer }}
