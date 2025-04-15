@@ -95,7 +95,7 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 }
 
 func initTofu(tempDir string) (string, error) {
-	_, stdErr, _, err := execute.Execute(
+	stdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"-chdir=" + tempDir,
@@ -105,7 +105,7 @@ func initTofu(tempDir string) (string, error) {
 		map[string]string{})
 
 	if err != nil {
-		return "", errors.New("Failed to init: " + stdErr)
+		return "", errors.New("Failed to init: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
 	lockFile, err := os.ReadFile(filepath.Join(tempDir, ".terraform.lock.hcl"))
