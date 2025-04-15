@@ -24,8 +24,16 @@ go.work.sum
 # env file
 .env
 
-binaries/opa_linux_amd64
-binaries/tofu
-provider/**/terraform-provider-octopusdeploy*
+functions/binaries/opa_linux_amd64
+functions/binaries/tofu
+functions/binaries/README.md
+functions/binaries/LICENSE
+functions/binaries/CHANGELOG.md
+functions/provider/**/terraform-provider-octopusdeploy*
+functions/provider/**/README.md
+functions/provider/**/LICENSE
+
+*.zip
+*.tar.gz
 
 terraform.tfstate
