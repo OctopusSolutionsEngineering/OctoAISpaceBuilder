@@ -112,7 +112,7 @@ jobs:
           OCTOPUS_URL: https://mattc.octopus.app
           OCTOPUS_SPACE: "Octopus Copilot"
         with:
-          packages: functions/octoterra_azure.${{ steps.determine_version.outputs.semVer }}.zip
+          packages: functions/spacebuilder_azure.${{ steps.determine_version.outputs.semVer }}.zip
           overwrite_mode: OverwriteExisting
       - name: Create Octopus Release
         if: ${{ steps.branch-name.outputs.current_branch == 'main' }}
