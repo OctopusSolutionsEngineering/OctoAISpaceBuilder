@@ -7,6 +7,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -14,7 +15,7 @@ import (
 	"path/filepath"
 )
 
-func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.TerraformApply, error) {
+func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*model.TerraformApply, error) {
 
 	aud, err := jwt.GetJwtAud(token)
 
@@ -22,7 +23,7 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.
 		return nil, err
 	}
 
-	terraform.Server = sha.GetSha256Hash(aud)
+	terraformApply.Server = sha.GetSha256Hash(aud)
 
 	tempDir, err := files.CreateTempDir()
 
@@ -37,10 +38,10 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.
 	}()
 
 	planFile := filepath.Join(tempDir, "tfplan")
-	lockFileName := filepath.Join(tempDir, ".terraform.lock.hcl")
-	configurationFileName := filepath.Join(tempDir, "terraform.tf")
+	lockFileName := filepath.Join(tempDir, ".terraformApply.lock.hcl")
+	configurationFileName := filepath.Join(tempDir, "terraformApply.tf")
 
-	planContents, _, lockFile, configuration, err := infrastructure.ReadFeedbackAzureStorageTable(terraform)
+	planContents, _, lockFile, configuration, err := infrastructure.ReadFeedbackAzureStorageTable(terraformApply)
 
 	if err != nil {
 		return nil, err
@@ -71,6 +72,10 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.
 	}
 
 	if err := os.WriteFile(configurationFileName, []byte(configuration), 0644); err != nil {
+		return nil, err
+	}
+
+	if err := terraform.WriteBackendOverride(tempDir); err != nil {
 		return nil, err
 	}
 
@@ -110,8 +115,8 @@ func CreateTerraformApply(token string, terraform model.TerraformApply) (*model.
 
 	response := model.TerraformApply{
 		ID:        uuid.New().String(),
-		PlanId:    terraform.PlanId,
-		Server:    terraform.Server,
+		PlanId:    terraformApply.PlanId,
+		Server:    terraformApply.Server,
 		ApplyText: &stdout,
 	}
 

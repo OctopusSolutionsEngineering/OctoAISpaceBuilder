@@ -9,6 +9,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -32,6 +33,10 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 	}()
 
 	if err := os.WriteFile(filepath.Join(tempDir, "terraformInput.tf"), []byte(terraformInput.Configuration), 0644); err != nil {
+		return nil, err
+	}
+
+	if err := terraform.WriteBackendOverride(tempDir); err != nil {
 		return nil, err
 	}
 
