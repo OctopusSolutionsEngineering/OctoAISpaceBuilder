@@ -120,7 +120,7 @@ func initTofu(tempDir string) (string, error) {
 func generatePlan(tempDir string, token string, aud string, spaceId string) (string, string, error) {
 	planFile := filepath.Join(tempDir, "tfplan")
 
-	_, stdErr, _, err := execute.Execute(
+	stdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"-chdir=" + tempDir,
@@ -135,7 +135,7 @@ func generatePlan(tempDir string, token string, aud string, spaceId string) (str
 		})
 
 	if err != nil {
-		return "", "", errors.New("Failed to generate plan: " + stdErr)
+		return "", "", errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
 	plan, err := os.ReadFile(planFile)
@@ -148,7 +148,7 @@ func generatePlan(tempDir string, token string, aud string, spaceId string) (str
 }
 
 func generatePlanJson(planFile string) (string, error) {
-	planJsonStdOut, _, _, err := execute.Execute(
+	planJsonStdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"show",
@@ -158,14 +158,14 @@ func generatePlanJson(planFile string) (string, error) {
 		map[string]string{})
 
 	if err != nil {
-		return "", nil
+		return "", errors.New("Failed to generate plan json: " + stdErr + " " + planJsonStdOut + " " + err.Error())
 	}
 
 	return planJsonStdOut, nil
 }
 
 func generatePlanText(planFile string) (string, error) {
-	planStdOut, _, _, err := execute.Execute(
+	planStdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
 			"show",
@@ -174,7 +174,7 @@ func generatePlanText(planFile string) (string, error) {
 		map[string]string{})
 
 	if err != nil {
-		return "", nil
+		return "", errors.New("Failed to generate plan text: " + stdErr + " " + planStdOut + " " + err.Error())
 	}
 
 	return planStdOut, nil
