@@ -1,0 +1,24 @@
+step "deploy-with-cli" {
+    name = "Deploy with CLI"
+
+    action {
+        properties = {
+            Octopus.Action.Template.Id = "ActionTemplates-4321"
+            Octopus.Action.Template.Version = "2"
+            Packages.FunctionApp = "{\"PackageId\":\"spacebuilder_azure\",\"FeedId\":\"octopus-server-built-in\"}"
+        }
+        worker_pool = "hosted-ubuntu"
+
+        packages "Packages.FunctionApp" {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "spacebuilder_azure"
+            properties = {
+                Extract = "True"
+                PackageParameterName = "Packages.FunctionApp"
+                Purpose = ""
+                SelectionMode = "deferred"
+            }
+        }
+    }
+}
