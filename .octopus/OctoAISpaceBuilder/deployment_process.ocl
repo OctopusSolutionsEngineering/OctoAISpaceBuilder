@@ -2,6 +2,7 @@ step "deploy-with-cli" {
     name = "Deploy with CLI"
 
     action {
+        environments = ["production"]
         properties = {
             Octopus.Action.Template.Id = "ActionTemplates-4321"
             Octopus.Action.Template.Version = "2"
@@ -32,6 +33,7 @@ step "remove-worker-access" {
     name = "Remove worker access"
 
     action {
+        environments = ["production"]
         properties = {
             Octopus.Action.Template.Id = "ActionTemplates-4322"
             Octopus.Action.Template.Version = "0"
