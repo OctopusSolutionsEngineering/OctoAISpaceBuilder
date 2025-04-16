@@ -73,7 +73,7 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 		return nil, err
 	}
 
-	planJson, err := generatePlanJson(planFile)
+	planJson, err := generatePlanJson(tempDir, planFile)
 
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 		return nil, err
 	}
 
-	planText, err := generatePlanText(planFile)
+	planText, err := generatePlanText(tempDir, planFile)
 
 	if err != nil {
 		return nil, err
@@ -147,10 +147,11 @@ func generatePlan(tempDir string, token string, aud string, spaceId string) (str
 	return planFile, base64.StdEncoding.EncodeToString(plan), nil
 }
 
-func generatePlanJson(planFile string) (string, error) {
+func generatePlanJson(tempDir string, planFile string) (string, error) {
 	planJsonStdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
+			"-chdir=" + tempDir,
 			"show",
 			"-json",
 			"-no-color",
@@ -164,10 +165,11 @@ func generatePlanJson(planFile string) (string, error) {
 	return planJsonStdOut, nil
 }
 
-func generatePlanText(planFile string) (string, error) {
+func generatePlanText(tempDir string, planFile string) (string, error) {
 	planStdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
+			"-chdir=" + tempDir,
 			"show",
 			"-no-color",
 			planFile},
