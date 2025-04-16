@@ -95,6 +95,8 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 }
 
 func initTofu(tempDir string) (string, error) {
+	zap.L().Info("Init tofu")
+
 	stdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
@@ -120,6 +122,8 @@ func initTofu(tempDir string) (string, error) {
 }
 
 func generatePlan(tempDir string, token string, aud string, spaceId string) (string, string, error) {
+	zap.L().Info("Generating plan")
+
 	planFile := filepath.Join(tempDir, "tfplan")
 
 	stdOut, stdErr, _, err := execute.Execute(
@@ -151,6 +155,8 @@ func generatePlan(tempDir string, token string, aud string, spaceId string) (str
 }
 
 func generatePlanJson(tempDir string, planFile string) (string, error) {
+	zap.L().Info("Generating plan JSON")
+
 	planJsonStdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
@@ -171,6 +177,8 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 }
 
 func generatePlanText(tempDir string, planFile string) (string, error) {
+	zap.L().Info("Generating plan text")
+
 	planStdOut, stdErr, _, err := execute.Execute(
 		"binaries/tofu",
 		[]string{
