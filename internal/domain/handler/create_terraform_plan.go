@@ -198,6 +198,8 @@ func generatePlanText(tempDir string, planFile string) (string, error) {
 }
 
 func checkPlan(planJson string) error {
+	zap.L().Info("Checking plan with OPA")
+
 	tempDir, err := files.CreateTempDir()
 
 	if err != nil {
