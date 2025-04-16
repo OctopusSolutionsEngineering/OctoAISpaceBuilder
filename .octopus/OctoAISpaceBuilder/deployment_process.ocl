@@ -48,7 +48,7 @@ step "remove-worker-access" {
 }
 
 step "scan-for-security-vulnerabilities" {
-    name = "Scan for Security Vulnerabilities "
+    name = "Scan for Security Vulnerabilities"
 
     action {
         environments = ["security"]
@@ -56,8 +56,21 @@ step "scan-for-security-vulnerabilities" {
             Octopus.Action.AutoRetry.MaximumCount = "3"
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-4361"
-            Octopus.Action.Template.Version = "0"
+            Octopus.Action.Template.Version = "1"
+            SecurityScan.Package = "{\"PackageId\":\"spacebuilder_azure\",\"FeedId\":\"octopus-server-built-in\"}"
         }
         worker_pool_variable = ""
+
+        packages "OctopusCopilot" {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "spacebuilder_azure"
+            properties = {
+                Extract = "True"
+                PackageParameterName = "SecurityScan.Package"
+                Purpose = ""
+                SelectionMode = "deferred"
+            }
+        }
     }
 }
