@@ -102,7 +102,9 @@ func initTofu(tempDir string) (string, error) {
 			"init",
 			"-input=false",
 			"-no-color"},
-		map[string]string{})
+		map[string]string{
+			"TF_INPUT": "0",
+		})
 
 	if err != nil {
 		return "", errors.New("Failed to init: " + stdErr + " " + stdOut + " " + err.Error())
@@ -132,6 +134,7 @@ func generatePlan(tempDir string, token string, aud string, spaceId string) (str
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
 			"OCTOPUS_URL":          aud,
+			"TF_INPUT":             "0",
 		})
 
 	if err != nil {
@@ -156,7 +159,9 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 			"-json",
 			"-no-color",
 			planFile},
-		map[string]string{})
+		map[string]string{
+			"TF_INPUT": "0",
+		})
 
 	if err != nil {
 		return "", errors.New("Failed to generate plan json: " + stdErr + " " + planJsonStdOut + " " + err.Error())
@@ -173,7 +178,9 @@ func generatePlanText(tempDir string, planFile string) (string, error) {
 			"show",
 			"-no-color",
 			planFile},
-		map[string]string{})
+		map[string]string{
+			"TF_INPUT": "0",
+		})
 
 	if err != nil {
 		return "", errors.New("Failed to generate plan text: " + stdErr + " " + planStdOut + " " + err.Error())
