@@ -48,7 +48,7 @@ step "remove-worker-access" {
 }
 
 step "scan-for-security-vulnerabilities" {
-    name = "Scan for Security Vulnerabilities"
+    name = "Scan for Security Vulnerabilities "
 
     action {
         environments = ["security"]
