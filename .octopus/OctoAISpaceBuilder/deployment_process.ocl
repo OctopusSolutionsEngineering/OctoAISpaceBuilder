@@ -51,6 +51,7 @@ step "scan-for-security-vulnerabilities" {
     name = "Scan for Security Vulnerabilities"
 
     action {
+        environments = ["security"]
         properties = {
             Octopus.Action.AutoRetry.MaximumCount = "3"
             Octopus.Action.RunOnServer = "true"
