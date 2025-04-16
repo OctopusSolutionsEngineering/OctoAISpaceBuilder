@@ -55,7 +55,7 @@ step "scan-for-security-vulnerabilities" {
             Octopus.Action.AutoRetry.MaximumCount = "3"
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-4361"
-            Octopus.Action.Template.Version = "2"
+            Octopus.Action.Template.Version = "3"
             SecurityScan.Package = "{\"PackageId\":\"spacebuilder_azure\",\"FeedId\":\"octopus-server-built-in\"}"
         }
         worker_pool_variable = ""
