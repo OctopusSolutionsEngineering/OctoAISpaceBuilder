@@ -89,6 +89,7 @@ func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*m
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
 			"OCTOPUS_URL":          aud,
+			"TF_INPUT":             "0",
 		})
 
 	if err != nil {
@@ -107,6 +108,7 @@ func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*m
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
 			"OCTOPUS_URL":          aud,
+			"TF_INPUT":             "0",
 		})
 
 	if err != nil {
