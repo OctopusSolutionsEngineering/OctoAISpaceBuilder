@@ -14,11 +14,7 @@ func WriteOverrides(path string) error {
 		return err
 	}
 
-	if err := WriteProviderServerVariableOverrides(path); err != nil {
-		return err
-	}
-
-	if err := WriteProviderApiKeyVariableOverrides(path); err != nil {
+	if err := WriteVariableFile(path); err != nil {
 		return err
 	}
 
@@ -53,28 +49,13 @@ func WriteProviderOverrides(path string) error {
 	return os.WriteFile(filePath, []byte(providerOverrides), 0644)
 }
 
-// WriteProviderServerVariableOverrides overrides the space variable often used to define the server in the provider block.
-// This value must be a blank string for the provider to use the environment variable. It also requires a default value
-// to avoid errors.
-func WriteProviderServerVariableOverrides(path string) error {
-	serverVar := `variable "octopus_server" {
-	  default = ""
-	}`
+// WriteVariableFile defines empty values for variables often used with the provider. We rely on the fact that
+// tofu will ignore variable values for variables that are not set in the plan.
+func WriteVariableFile(path string) error {
+	serverVar := `octopus_apikey = ""
+octopus_server = ""`
 
-	filePath := filepath.Join(path, "provider_server_variable_override.tf")
+	filePath := filepath.Join(path, "terraform.tfvars")
 
 	return os.WriteFile(filePath, []byte(serverVar), 0644)
-}
-
-// WriteProviderApiKeyVariableOverrides overrides the api key variable often used to define the api key in the provider block.
-// This value must be a blank string for the provider to use the environment variable. It also requires a default value
-// to avoid errors.
-func WriteProviderApiKeyVariableOverrides(path string) error {
-	apikeyVar := `variable "octopus_apikey" {
-	  default = ""
-	}`
-
-	filePath := filepath.Join(path, "provider_api_key_variable_override.tf")
-
-	return os.WriteFile(filePath, []byte(apikeyVar), 0644)
 }
