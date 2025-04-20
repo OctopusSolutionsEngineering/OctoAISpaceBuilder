@@ -84,7 +84,7 @@ jobs:
         shell: bash
       - name: Test
         run: |-
-          apt-get install -y gotestsum
+          sudo apt-get install -y gotestsum
           gotestsum --junitfile results.xml -- -v -coverprofile=coverage.out -coverpkg=github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/... -timeout 0 -json ./...
           go tool cover -html=coverage.out -o=coverage.html
           go tool cover -func=coverage.out -o=coverage.out
