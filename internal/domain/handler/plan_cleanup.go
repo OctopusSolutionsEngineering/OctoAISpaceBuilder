@@ -2,7 +2,9 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
+	"go.uber.org/zap"
 )
 
 const OldPlanThresholdMinutes = 5
@@ -13,6 +15,8 @@ func RemoveOldPlans() error {
 	if err != nil {
 		return err
 	}
+
+	zap.L().Info("Cleaning up " + fmt.Sprint(len(oldPlans)) + " old plans")
 
 	// Try to delete all the old plans, collecting any errors rather than returning immediately
 	deleteErrors := []error{}
