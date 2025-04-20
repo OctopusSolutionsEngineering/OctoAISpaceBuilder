@@ -37,3 +37,5 @@ functions/provider/**/LICENSE
 *.tar.gz
 
 terraform.tfstate
+
+**/spacebuilder_linux_amd64_azure
