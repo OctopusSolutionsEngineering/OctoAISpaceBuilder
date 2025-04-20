@@ -5,8 +5,9 @@ This services forces the use of a local backend, which is not persisted between 
 ## Security Considerations
 
 * The use of local state is enforced with overrides.
-* Plugins must use a local mirror with the CLI configuration.
+* Plugins must use a local mirror with the CLI configuration, so no providers are downloaded.
 * OPA enforces rules that only allow Octopus resources to be created.
 * OPA enforces rules that prohibit sensitive values being defined in the configuration.
 * The client can only send Terraform configuration. The service defines all the file names (i.e. the service controls overrides).
 * The client can not send variable values as separate files.
+* Old plan records are deleted after 5 minutes.
