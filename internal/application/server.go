@@ -14,6 +14,7 @@ func StartServer() error {
 	router.POST("/api/terraformplan", middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformPlan)
 	router.POST("/api/terraformapply", middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformApply)
 	router.GET("/api/health", Health)
+	router.GET("/", Health)
 	router.Any("/cleanup", CleanupOldPlans)
 
 	return router.Run("localhost:" + environment.GetPort())
