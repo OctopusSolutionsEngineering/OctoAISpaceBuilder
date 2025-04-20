@@ -36,15 +36,7 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 		return nil, err
 	}
 
-	if err := terraform.WriteBackendOverride(tempDir); err != nil {
-		return nil, err
-	}
-
-	if err := terraform.WriteProviderServerVariableOverrides(tempDir); err != nil {
-		return nil, err
-	}
-
-	if err := terraform.WriteProviderApiKeyVariableOverrides(tempDir); err != nil {
+	if err := terraform.WriteOverrides(tempDir); err != nil {
 		return nil, err
 	}
 
