@@ -10,7 +10,7 @@ const testJwt = "eyJhbGciOiJQUzI1NiIsImtpZCI6IjU2YjI4ZWM4N2E1MzQ3ZWQ4ZjdjZGNhZDJ
 
 func TestGetAud(t *testing.T) {
 	if aud, err := GetJwtAud(testJwt); err != nil || aud != "http://localhost:8080" {
-		t.Fatalf("failed to get JWT audience, was " + aud)
+		t.Fatal("failed to get JWT audience, was " + aud)
 	}
 }
 

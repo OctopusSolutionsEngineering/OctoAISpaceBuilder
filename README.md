@@ -11,3 +11,17 @@ This services forces the use of a local backend, which is not persisted between 
 * The client can only send Terraform configuration. The service defines all the file names (i.e. the service controls overrides).
 * The client can not send variable values as separate files.
 * Old plan records are deleted after 5 minutes.
+
+## Testing
+
+Start the Azurite emulator with the following command:
+
+```bash
+docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+```
+
+Set the `AzureWebJobsStorage` environment variable to:
+
+```
+DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
+```

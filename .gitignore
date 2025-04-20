@@ -39,3 +39,4 @@ functions/provider/**/LICENSE
 terraform.tfstate
 
 **/spacebuilder_linux_amd64_azure
+results.xml
