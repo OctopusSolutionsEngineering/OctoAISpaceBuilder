@@ -79,6 +79,14 @@ func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*m
 		return nil, err
 	}
 
+	if err := terraform.WriteProviderServerVariableOverrides(tempDir); err != nil {
+		return nil, err
+	}
+
+	if err := terraform.WriteProviderApiKeyVariableOverrides(tempDir); err != nil {
+		return nil, err
+	}
+
 	_, _, _, err = execute.Execute(
 		"binaries/tofu",
 		[]string{

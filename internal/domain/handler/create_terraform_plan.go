@@ -40,6 +40,14 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 		return nil, err
 	}
 
+	if err := terraform.WriteProviderServerVariableOverrides(tempDir); err != nil {
+		return nil, err
+	}
+
+	if err := terraform.WriteProviderApiKeyVariableOverrides(tempDir); err != nil {
+		return nil, err
+	}
+
 	aud, err := jwt.GetJwtAud(token)
 
 	if err != nil {
