@@ -15,7 +15,7 @@ func getServerTokenApiKey(c *gin.Context) (string, string, string, error) {
 		server, err := jwt.GetJwtAud(token)
 
 		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to validate token", err))
+			c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to validate token extracting server", err))
 			return "", "", "", err
 		}
 
