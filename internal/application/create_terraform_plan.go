@@ -43,5 +43,6 @@ func CreateTerraformPlan(c *gin.Context) {
 		return
 	}
 
+	c.Header("Content-Type", "application/json")
 	c.String(http.StatusCreated, string(responseJSON))
 }
