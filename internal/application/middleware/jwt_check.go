@@ -26,7 +26,7 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		aud, err := jwt.ValidateJWT(token, skipValidation)
 
 		if err != nil {
-			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to validate token in middleware", err))
+			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to validate token in middleware with token "+getFirstChars(token), err))
 			c.Abort()
 			return
 		}
@@ -67,4 +67,11 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		// normal request, and the execution chain is called down
 		c.Next()
 	}
+}
+
+func getFirstChars(s string) string {
+	if len(s) <= 4 {
+		return s
+	}
+	return s[:4]
 }
