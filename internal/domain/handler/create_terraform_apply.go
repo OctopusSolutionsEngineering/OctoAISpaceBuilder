@@ -115,6 +115,15 @@ func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*m
 		return nil, err
 	}
 
+	if err := infrastructure.DeleteTerraformPlan(infrastructure.TableEntityId{
+		RowKey:       terraformApply.PlanId,
+		PartitionKey: terraformApply.Server,
+	}); err != nil {
+		// We're not going to fail here, but we'll log the error.
+		// Any old plans will be cleaned up by the terraform plan cleanup job.
+		zap.L().Error("Failed to delete terraform plan", zap.Error(err))
+	}
+
 	response := model.TerraformApply{
 		ID:        uuid.New().String(),
 		PlanId:    terraformApply.PlanId,
