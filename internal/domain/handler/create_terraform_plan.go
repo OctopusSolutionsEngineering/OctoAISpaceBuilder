@@ -130,7 +130,7 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 			"-var=octopus_space_id=" + spaceId},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN":  token,
-			"OCTOPUS_APIKEY":        apiKey,
+			"OCTOPUS_API_KEY":       apiKey,
 			"OCTOPUS_URL":           aud,
 			"TF_INPUT":              "0",
 			"TF_VAR_octopus_apikey": "",

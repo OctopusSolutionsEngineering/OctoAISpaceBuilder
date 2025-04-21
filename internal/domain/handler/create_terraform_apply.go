@@ -81,7 +81,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 			"-no-color"},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN":  token,
-			"OCTOPUS_APIKEY":        apiKey,
+			"OCTOPUS_API_KEY":       apiKey,
 			"OCTOPUS_URL":           server,
 			"TF_INPUT":              "0",
 			"TF_VAR_octopus_apikey": "",
@@ -104,7 +104,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN":  token,
 			"OCTOPUS_URL":           server,
-			"OCTOPUS_APIKEY":        apiKey,
+			"OCTOPUS_API_KEY":       apiKey,
 			"TF_INPUT":              "0",
 			"TF_VAR_octopus_apikey": "",
 			"TF_VAR_octopus_server": "",
