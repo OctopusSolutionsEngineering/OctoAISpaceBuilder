@@ -9,13 +9,13 @@ import (
 )
 
 func getServerTokenApiKey(c *gin.Context) (string, string, string, error) {
-	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+	token := strings.TrimSpace(strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer "))
 
-	if strings.TrimSpace(token) != "" {
+	if token != "" {
 		server, err := jwt.GetJwtAud(token)
 
 		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
+			c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to validate token", err))
 			return "", "", "", err
 		}
 
