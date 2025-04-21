@@ -8,12 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func CreateTerraformApply(c *gin.Context) {
-
-	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
 	body, err := io.ReadAll(c.Request.Body)
 

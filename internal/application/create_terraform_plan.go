@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func CreateTerraformPlan(c *gin.Context) {
@@ -27,8 +26,6 @@ func CreateTerraformPlan(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
 		return
 	}
-
-	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
 	server, token, apiKey, err := getServerTokenApiKey(c)
 
