@@ -30,7 +30,9 @@ func CreateTerraformPlan(c *gin.Context) {
 
 	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
-	response, err := handler.CreateTerraformPlan(token, terraformInput)
+	server, token, apiKey, err := getServerTokenApiKey(c)
+
+	response, err := handler.CreateTerraformPlan(server, token, apiKey, terraformInput)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))

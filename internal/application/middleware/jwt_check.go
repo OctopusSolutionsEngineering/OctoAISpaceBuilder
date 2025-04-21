@@ -17,6 +17,12 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		// We accept any user with a valid JWT token that appears to authenticate with an Octopus Deploy instance.
 		token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
+		if token == "" {
+			// If the token is empty, we don't need to do anything
+			c.Next()
+			return
+		}
+
 		aud, err := jwt.ValidateJWT(token, skipValidation)
 
 		if err != nil {

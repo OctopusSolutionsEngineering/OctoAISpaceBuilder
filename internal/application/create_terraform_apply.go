@@ -30,7 +30,14 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	response, err := handler.CreateTerraformApply(token, terraform)
+	server, token, apiKey, err := getServerTokenApiKey(c)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
+		return
+	}
+
+	response, err := handler.CreateTerraformApply(server, token, apiKey, terraform)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))

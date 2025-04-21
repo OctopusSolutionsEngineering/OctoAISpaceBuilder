@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
@@ -18,7 +17,7 @@ import (
 	"time"
 )
 
-func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
+func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
 
 	tempDir, err := files.CreateTempDir()
 
@@ -40,12 +39,6 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 		return nil, err
 	}
 
-	aud, err := jwt.GetJwtAud(token)
-
-	if err != nil {
-		return nil, err
-	}
-
 	if err := createTerraformRcFile(); err != nil {
 		return nil, err
 	}
@@ -56,7 +49,7 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 		return nil, err
 	}
 
-	planFile, planBinary, err := generatePlan(tempDir, token, aud, terraformInput.SpaceId)
+	planFile, planBinary, err := generatePlan(tempDir, token, apiKey, server, terraformInput.SpaceId)
 
 	if err != nil {
 		return nil, err
@@ -65,7 +58,7 @@ func CreateTerraformPlan(token string, terraformInput model.TerraformPlan) (*mod
 	response := model.TerraformPlan{
 		ID:      uuid.New().String(),
 		Created: time.Now(),
-		Server:  sha.GetSha256Hash(aud),
+		Server:  sha.GetSha256Hash(server),
 		SpaceId: terraformInput.SpaceId,
 	}
 
@@ -121,7 +114,7 @@ func initTofu(tempDir string) (string, error) {
 	return base64.StdEncoding.EncodeToString(lockFile), nil
 }
 
-func generatePlan(tempDir string, token string, aud string, spaceId string) (string, string, error) {
+func generatePlan(tempDir string, token string, apiKey string, aud string, spaceId string) (string, string, error) {
 	zap.L().Info("Generating plan for " + aud)
 
 	planFile := filepath.Join(tempDir, "tfplan")
@@ -137,6 +130,7 @@ func generatePlan(tempDir string, token string, aud string, spaceId string) (str
 			"-var=octopus_space_id=" + spaceId},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
+			"OCTOPUS_APIKEY":       apiKey,
 			"OCTOPUS_URL":          aud,
 			"TF_INPUT":             "0",
 		})

@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
@@ -15,15 +14,9 @@ import (
 	"path/filepath"
 )
 
-func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*model.TerraformApply, error) {
+func CreateTerraformApply(server string, token string, apiKey string, terraformApply model.TerraformApply) (*model.TerraformApply, error) {
 
-	aud, err := jwt.GetJwtAud(token)
-
-	if err != nil {
-		return nil, err
-	}
-
-	terraformApply.Server = sha.GetSha256Hash(aud)
+	terraformApply.Server = sha.GetSha256Hash(server)
 
 	tempDir, err := files.CreateTempDir()
 
@@ -88,7 +81,8 @@ func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*m
 			"-no-color"},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
-			"OCTOPUS_URL":          aud,
+			"OCTOPUS_APIKEY":       apiKey,
+			"OCTOPUS_URL":          server,
 			"TF_INPUT":             "0",
 		})
 
@@ -107,7 +101,8 @@ func CreateTerraformApply(token string, terraformApply model.TerraformApply) (*m
 			planFile},
 		map[string]string{
 			"OCTOPUS_ACCESS_TOKEN": token,
-			"OCTOPUS_URL":          aud,
+			"OCTOPUS_URL":          server,
+			"OCTOPUS_APIKEY":       apiKey,
 			"TF_INPUT":             "0",
 		})
 
