@@ -122,7 +122,7 @@ func initTofu(tempDir string) (string, error) {
 }
 
 func generatePlan(tempDir string, token string, aud string, spaceId string) (string, string, error) {
-	zap.L().Info("Generating plan")
+	zap.L().Info("Generating plan for " + aud)
 
 	planFile := filepath.Join(tempDir, "tfplan")
 
