@@ -48,6 +48,6 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	c.Header("Content-Type", "application/json")
+	c.Header("Content-Type", "application/vnd.api+json")
 	c.String(http.StatusCreated, string(responseJSON))
 }
