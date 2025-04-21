@@ -20,5 +20,6 @@ func Health(c *gin.Context) {
 		return
 	}
 
+	c.Header("Content-Type", "application/json")
 	c.String(200, string(responseJSON))
 }
