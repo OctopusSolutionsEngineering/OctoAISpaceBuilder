@@ -14,10 +14,6 @@ func WriteOverrides(path string) error {
 		return err
 	}
 
-	if err := WriteVariableFile(path); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -47,15 +43,4 @@ func WriteProviderOverrides(path string) error {
 	filePath := filepath.Join(path, "provider_override.tf")
 
 	return os.WriteFile(filePath, []byte(providerOverrides), 0644)
-}
-
-// WriteVariableFile defines empty values for variables often used with the provider. We rely on the fact that
-// tofu will ignore variable values for variables that are not set in the plan.
-func WriteVariableFile(path string) error {
-	serverVar := `octopus_apikey = ""
-octopus_server = ""`
-
-	filePath := filepath.Join(path, "terraform.tfvars")
-
-	return os.WriteFile(filePath, []byte(serverVar), 0644)
 }
