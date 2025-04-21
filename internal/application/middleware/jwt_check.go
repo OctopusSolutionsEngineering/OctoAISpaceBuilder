@@ -15,9 +15,9 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 
 		// At the end of the day, this service is essentially unauthenticated.
 		// We accept any user with a valid JWT token that appears to authenticate with an Octopus Deploy instance.
-		token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+		token := strings.TrimSpace(strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer "))
 
-		if strings.TrimSpace(token) == "" {
+		if token == "" {
 			// If the token is empty, we don't need to do anything
 			c.Next()
 			return
@@ -26,7 +26,7 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		aud, err := jwt.ValidateJWT(token, skipValidation)
 
 		if err != nil {
-			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to process request", err))
+			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to validate token", err))
 			c.Abort()
 			return
 		}
