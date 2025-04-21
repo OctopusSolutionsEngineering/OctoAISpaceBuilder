@@ -11,7 +11,7 @@ import (
 func getServerTokenApiKey(c *gin.Context) (string, string, string, error) {
 	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
-	if token != "" {
+	if strings.TrimSpace(token) != "" {
 		server, err := jwt.GetJwtAud(token)
 
 		if err != nil {
