@@ -5,6 +5,7 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"net/url"
+	"strings"
 )
 
 func getHostname(server string) string {
@@ -26,6 +27,9 @@ func LogEnhanced(log string, server string) {
 	enhancedLogging := IsEnhancedLoggingEnabled(server)
 
 	if enhancedLogging {
-		zap.L().Info(log)
+		// Long logs were getting truncated in the console, so we split them into lines
+		for _, line := range strings.Split(log, "\n") {
+			zap.L().Info(line)
+		}
 	}
 }
