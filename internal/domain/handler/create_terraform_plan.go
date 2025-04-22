@@ -21,11 +21,7 @@ import (
 
 func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
 
-	enhancedLogging := logging.IsEnhancedLoggingEnabled(server)
-
-	if enhancedLogging {
-		zap.L().Info(terraformInput.Configuration)
-	}
+	logging.LogEnhanced(terraformInput.Configuration, server)
 
 	if err := validation.ValidateTerraformPlanRequest(terraformInput); err != nil {
 		return nil, err
