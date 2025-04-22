@@ -6,13 +6,9 @@ import (
 	"strings"
 )
 
-func ValidateTerraformPlan(plan model.TerraformPlan) error {
-	if strings.TrimSpace(plan.ID) == "" {
-		return errors.New("id is required")
-	}
-
-	if plan.PlanBinaryBase64 == nil || strings.TrimSpace(*plan.PlanBinaryBase64) == "" {
-		return errors.New("plan_binary is required")
+func ValidateTerraformPlanRequest(plan model.TerraformPlan) error {
+	if strings.TrimSpace(plan.SpaceId) == "" {
+		return errors.New("space_id is required")
 	}
 
 	return nil

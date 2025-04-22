@@ -9,6 +9,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/validation"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -18,6 +19,10 @@ import (
 )
 
 func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
+
+	if err := validation.ValidateTerraformPlanRequest(terraformInput); err != nil {
+		return nil, err
+	}
 
 	tempDir, err := files.CreateTempDir()
 
