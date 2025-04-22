@@ -1,6 +1,10 @@
 package environment
 
-import "os"
+import (
+	"encoding/json"
+	"go.uber.org/zap"
+	"os"
+)
 
 func GetPort() string {
 	// Get the port from the environment variable
@@ -18,4 +22,22 @@ func DisableValidation() bool {
 		return false // Default to false if not set
 	}
 	return disableValidation == "true"
+}
+
+// GetEnhancedLoggingInstances returns a list of instances for enhanced logging.
+// This allows developers to debug their issues without logging prompt responses for anyone else.
+func GetEnhancedLoggingInstances() []string {
+	instances := []string{}
+	instancesJson := os.Getenv("ENHANCED_LOGGING_INSTANCES")
+	if instancesJson == "" {
+		return []string{} // Default to empty slice if not set
+	}
+
+	err := json.Unmarshal([]byte(instancesJson), &instances)
+	if err != nil {
+		zap.L().Error("Error parsing JSON:", zap.Error(err))
+		return []string{}
+	}
+
+	return instances
 }

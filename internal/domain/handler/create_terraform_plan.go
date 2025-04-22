@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
@@ -19,6 +20,12 @@ import (
 )
 
 func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
+
+	enhancedLogging := logging.IsEnhancedLoggingEnabled(server)
+
+	if enhancedLogging {
+		zap.L().Info(terraformInput.Configuration)
+	}
 
 	if err := validation.ValidateTerraformPlanRequest(terraformInput); err != nil {
 		return nil, err
