@@ -146,6 +146,8 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 		})
 
 	if err != nil {
+		logging.LogEnhanced(stdErr, aud)
+		logging.LogEnhanced(stdOut, aud)
 		return "", "", errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
