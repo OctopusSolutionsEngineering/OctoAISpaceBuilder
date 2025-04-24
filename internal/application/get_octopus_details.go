@@ -12,7 +12,7 @@ func getServerTokenApiKey(c *gin.Context) (string, string, string, error) {
 
 	// Tokens take precedence over API keys
 	if token != "" {
-		return server, "", token, nil
+		return server, token, "", nil
 	}
 
 	return server, "", apiKey, nil
