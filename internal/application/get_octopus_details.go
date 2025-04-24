@@ -1,29 +1,19 @@
 package application
 
 import (
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"strings"
 )
 
 func getServerTokenApiKey(c *gin.Context) (string, string, string, error) {
 	token := strings.TrimSpace(strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer "))
-
-	if token != "" {
-		server, err := jwt.GetJwtAud(token)
-
-		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to validate token extracting server", err))
-			return "", "", "", err
-		}
-
-		return server, token, "", nil
-	}
-
-	apiKey := c.GetHeader("X-Octopus-ApiKey")
 	server := c.GetHeader("X-Octopus-Url")
+	apiKey := c.GetHeader("X-Octopus-ApiKey")
+
+	// Tokens take precedence over API keys
+	if token != "" {
+		return server, "", token, nil
+	}
 
 	return server, "", apiKey, nil
 }
