@@ -3,7 +3,6 @@ package middleware
 import (
 	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/jwt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -16,18 +15,11 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		// At the end of the day, this service is essentially unauthenticated.
 		// We accept any user with a valid JWT token that appears to authenticate with an Octopus Deploy instance.
 		token := strings.TrimSpace(strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer "))
+		server := c.GetHeader("X-Octopus-Url")
 
 		if token == "" {
 			// If the token is empty, we don't need to do anything
 			c.Next()
-			return
-		}
-
-		server := c.GetHeader("X-Octopus-Url")
-
-		if err := jwt.ValidateJWT(token, server, skipValidation); err != nil {
-			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to validate token in middleware with token "+getFirstChars(token), err))
-			c.Abort()
 			return
 		}
 
