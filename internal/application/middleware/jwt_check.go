@@ -60,10 +60,3 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-func getFirstChars(s string) string {
-	if len(s) <= 4 {
-		return s
-	}
-	return s[:4]
-}
