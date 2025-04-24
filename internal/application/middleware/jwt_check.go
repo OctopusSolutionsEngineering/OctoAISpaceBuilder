@@ -23,15 +23,15 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 			return
 		}
 
-		aud, err := jwt.ValidateJWT(token, skipValidation)
+		server := c.GetHeader("X-Octopus-Url")
 
-		if err != nil {
+		if err := jwt.ValidateJWT(token, server, skipValidation); err != nil {
 			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to validate token in middleware with token "+getFirstChars(token), err))
 			c.Abort()
 			return
 		}
 
-		apiURL, err := url.Parse(aud)
+		apiURL, err := url.Parse(server)
 		if err != nil {
 			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to process request", err))
 			c.Abort()

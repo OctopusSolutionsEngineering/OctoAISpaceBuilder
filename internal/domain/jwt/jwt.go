@@ -139,12 +139,6 @@ func GetJwtAud(tokenString string) (string, error) {
 	return "", errors.New("aud claim not found")
 }
 
-func ValidateJWT(tokenString string, skipValidation bool) (string, error) {
-	aud, err := GetJwtAud(tokenString)
-
-	if err != nil {
-		return "", err
-	}
-
-	return aud, ValidateJWTWithJWKS(tokenString, aud+"/.well-known/jwks", GetKeyFromJWKS, skipValidation)
+func ValidateJWT(tokenString string, server string, skipValidation bool) error {
+	return ValidateJWTWithJWKS(tokenString, server+"/.well-known/jwks", GetKeyFromJWKS, skipValidation)
 }
