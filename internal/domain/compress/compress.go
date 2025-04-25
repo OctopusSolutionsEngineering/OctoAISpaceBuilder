@@ -13,10 +13,15 @@ func CompressByteArray(data []byte) (string, error) {
 	var compressedBuffer bytes.Buffer
 
 	// Create a gzip writer
-	gzipWriter := gzip.NewWriter(&compressedBuffer)
+	gzipWriter, err := gzip.NewWriterLevel(&compressedBuffer, gzip.BestCompression)
+
+	if err != nil {
+		return "", err
+	}
 
 	// Write the data to the gzip writer
-	_, err := gzipWriter.Write(data)
+	_, err = gzipWriter.Write(data)
+
 	if err != nil {
 		return "", err
 	}
