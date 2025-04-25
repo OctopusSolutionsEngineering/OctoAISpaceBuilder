@@ -31,25 +31,7 @@ func CompressByteArray(data []byte) (string, error) {
 }
 
 func CompressString(data string) (string, error) {
-	// Create a buffer to hold the compressed data
-	var compressedBuffer bytes.Buffer
-
-	// Create a gzip writer
-	gzipWriter := gzip.NewWriter(&compressedBuffer)
-
-	// Write the data to the gzip writer
-	_, err := gzipWriter.Write([]byte(data))
-	if err != nil {
-		return "", err
-	}
-
-	// Close the writer to flush any pending data
-	if err := gzipWriter.Close(); err != nil {
-		return "", err
-	}
-
-	// Return base64 encoded compressed data
-	return base64.StdEncoding.EncodeToString(compressedBuffer.Bytes()), nil
+	return CompressByteArray([]byte(data))
 }
 
 func DecompressString(compressedData string) (string, error) {
