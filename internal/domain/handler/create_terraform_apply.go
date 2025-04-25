@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/base64"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/compress"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
@@ -40,7 +41,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		return nil, err
 	}
 
-	decoded, err := base64.StdEncoding.DecodeString(planContents)
+	decoded, err := compress.DecompressStringToByteArray(planContents)
 
 	if err != nil {
 		return nil, err

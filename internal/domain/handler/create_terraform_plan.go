@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/compress"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
@@ -157,7 +158,13 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 		return "", "", err
 	}
 
-	return planFile, base64.StdEncoding.EncodeToString(plan), nil
+	planCompressed, err := compress.CompressByteArray(plan)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	return planFile, planCompressed, nil
 }
 
 func generatePlanJson(tempDir string, planFile string) (string, error) {
