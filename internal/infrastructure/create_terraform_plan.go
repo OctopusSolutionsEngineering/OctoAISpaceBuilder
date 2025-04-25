@@ -7,7 +7,7 @@ import (
 )
 
 // https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/data/aztables
-func CreateFeedbackAzureStorageTable(id string, planBinary string, spaceId string, server string, lockFile string, configuration string) error {
+func CreatePlanAzureStorageTable(id string, planBinary string, spaceId string, server string, lockFile string, configuration string) error {
 	service, err := aztables.NewServiceClientFromConnectionString(GetStorageConnectionString(), nil)
 
 	if err != nil {

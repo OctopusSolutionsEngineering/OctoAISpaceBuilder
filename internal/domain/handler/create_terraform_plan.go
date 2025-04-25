@@ -70,7 +70,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		SpaceId: terraformInput.SpaceId,
 	}
 
-	if err := infrastructure.CreateFeedbackAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile, terraformInput.Configuration); err != nil {
+	if err := infrastructure.CreatePlanAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile, terraformInput.Configuration); err != nil {
 		return nil, err
 	}
 

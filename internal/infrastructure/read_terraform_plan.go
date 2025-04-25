@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func ReadFeedbackAzureStorageTable(terraformApply model.TerraformApply) (string, string, string, string, error) {
+func ReadPlanAzureStorageTable(terraformApply model.TerraformApply) (string, string, string, string, error) {
 	service, err := aztables.NewServiceClientFromConnectionString(GetStorageConnectionString(), nil)
 
 	if err != nil {
