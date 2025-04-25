@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/compress"
@@ -120,7 +119,13 @@ func initTofu(tempDir string) (string, error) {
 		return "", errors.New("Failed to get lock file: " + stdErr)
 	}
 
-	return base64.StdEncoding.EncodeToString(lockFile), nil
+	compressedLockFile, err := compress.CompressByteArray(lockFile)
+
+	if err != nil {
+		return "", err
+	}
+
+	return compressedLockFile, nil
 }
 
 func generatePlan(tempDir string, token string, apiKey string, aud string, spaceId string) (string, string, error) {

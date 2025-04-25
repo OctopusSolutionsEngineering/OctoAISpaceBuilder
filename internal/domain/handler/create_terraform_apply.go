@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/base64"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/compress"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
@@ -47,7 +46,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		return nil, err
 	}
 
-	decodedLockFile, err := base64.StdEncoding.DecodeString(lockFile)
+	decodedLockFile, err := compress.DecompressStringToByteArray(lockFile)
 
 	if err != nil {
 		return nil, err
