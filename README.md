@@ -1,4 +1,4 @@
-![Coverage](https://img.shields.io/badge/Coverage-69.7%25-yellow)
+![Coverage](https://img.shields.io/badge/Coverage-51.0%25-yellow)
 
 This microservice implements a web app, designed to be deployed as an Azure function, that generates a Terraform plan for an Octopus space with a call to `/api/terraformplan`, stores the plan, and then applies it with a call to `/api/terraformapply`. 
 
