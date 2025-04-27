@@ -175,3 +175,77 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 		return err
 	})
 }
+
+func TestHealthEndpoint(t *testing.T) {
+
+	// Set up Gin in test mode
+	gin.SetMode(gin.TestMode)
+
+	// Create a test router with the endpoint
+	router := gin.Default()
+
+	// Register the endpoint with mocked middleware
+	router.GET("/api/health", Health)
+
+	// Create test request
+	req, err := http.NewRequest(http.MethodGet, "/api/health", nil)
+
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+
+	// Create response recorder
+	w := httptest.NewRecorder()
+
+	// Serve the request
+	router.ServeHTTP(w, req)
+
+	// Assert status code
+	assert.Equal(t, 200, w.Code)
+
+	var response model.Health
+	err = jsonapi.Unmarshal(w.Body.Bytes(), &response)
+
+	if err != nil {
+		t.Fatalf("Failed to unmarshal response: %v", err)
+	}
+
+	assert.NotEmpty(t, response.ID)
+}
+
+func TestRootEndpoint(t *testing.T) {
+
+	// Set up Gin in test mode
+	gin.SetMode(gin.TestMode)
+
+	// Create a test router with the endpoint
+	router := gin.Default()
+
+	// Register the endpoint with mocked middleware
+	router.GET("/", Health)
+
+	// Create test request
+	req, err := http.NewRequest(http.MethodGet, "/", nil)
+
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+
+	// Create response recorder
+	w := httptest.NewRecorder()
+
+	// Serve the request
+	router.ServeHTTP(w, req)
+
+	// Assert status code
+	assert.Equal(t, 200, w.Code)
+
+	var response model.Health
+	err = jsonapi.Unmarshal(w.Body.Bytes(), &response)
+
+	if err != nil {
+		t.Fatalf("Failed to unmarshal response: %v", err)
+	}
+
+	assert.NotEmpty(t, response.ID)
+}
