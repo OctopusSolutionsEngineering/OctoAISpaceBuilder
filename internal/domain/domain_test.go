@@ -13,6 +13,10 @@ import (
 
 // TestPopulateSpaceWithK8sProject creates a space and populates it via the domain level handlers.
 func TestPopulateSpaceWithK8sProject(t *testing.T) {
+	if err := os.Setenv("AzureWebJobsStorage", "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"); err != nil {
+		t.Fatalf("Failed to set AzureWebJobsStorage: %v", err)
+	}
+
 	if err := os.Setenv("SPACEBUILDER_OPA_PATH", "opa"); err != nil {
 		t.Fatalf("Failed to set SPACEBUILDER_OPA_PATH: %v", err)
 	}
