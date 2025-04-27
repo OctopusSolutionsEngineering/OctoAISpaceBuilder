@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
 	"github.com/gin-gonic/gin"
@@ -38,9 +39,15 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 		t.Fatalf("Failed to set SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG: %v", err)
 	}
 
+	base, err := files.CopyDir("../../terraform")
+
+	if err != nil {
+		t.Fatalf("Failed to create space: %v", err)
+	}
+
 	testFramework := test.OctopusContainerTest{}
 	testFramework.ArrangeTest(t, func(t *testing.T, container *test.OctopusContainer, client *client.Client) error {
-		spaceId, err := testFramework.Act(t, container, "../../terraform", "2-localsetup", []string{})
+		spaceId, err := testFramework.Act(t, container, base, "2-localsetup", []string{})
 
 		if err != nil {
 			t.Fatalf("Failed to create space: %v", err)
