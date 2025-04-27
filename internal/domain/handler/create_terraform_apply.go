@@ -33,7 +33,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	lockFileName := filepath.Join(tempDir, ".terraformApply.lock.hcl")
 	configurationFileName := filepath.Join(tempDir, "terraformApply.tf")
 
-	planContents, lockFile, configuration, err := infrastructure.ReadPlanAzureStorageBlob(terraformApply.ID)
+	planContents, lockFile, configuration, err := infrastructure.ReadPlanAzureStorageBlob(terraformApply.PlanId)
 
 	if err != nil {
 		return nil, err
