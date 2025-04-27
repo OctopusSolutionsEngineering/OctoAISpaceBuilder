@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/compress"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
@@ -70,7 +69,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		SpaceId: terraformInput.SpaceId,
 	}
 
-	if err := infrastructure.CreatePlanAzureStorageTable(response.ID, planBinary, response.SpaceId, response.Server, lockFile, terraformInput.Configuration); err != nil {
+	if err := infrastructure.CreatePlanAzureStorageBlob(response.ID, planBinary, lockFile, []byte(terraformInput.Configuration)); err != nil {
 		return nil, err
 	}
 
@@ -95,7 +94,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	return &response, nil
 }
 
-func initTofu(tempDir string) (string, error) {
+func initTofu(tempDir string) ([]byte, error) {
 	zap.L().Info("Init tofu")
 
 	stdOut, stdErr, _, err := execute.Execute(
@@ -110,25 +109,19 @@ func initTofu(tempDir string) (string, error) {
 		})
 
 	if err != nil {
-		return "", errors.New("Failed to init: " + stdErr + " " + stdOut + " " + err.Error())
+		return nil, errors.New("Failed to init: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
 	lockFile, err := os.ReadFile(filepath.Join(tempDir, ".terraform.lock.hcl"))
 
 	if err != nil {
-		return "", errors.New("Failed to get lock file: " + stdErr)
+		return nil, errors.New("Failed to get lock file: " + stdErr)
 	}
 
-	compressedLockFile, err := compress.CompressByteArray(lockFile)
-
-	if err != nil {
-		return "", err
-	}
-
-	return compressedLockFile, nil
+	return lockFile, nil
 }
 
-func generatePlan(tempDir string, token string, apiKey string, aud string, spaceId string) (string, string, error) {
+func generatePlan(tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, error) {
 	zap.L().Info("Generating plan for " + aud)
 
 	planFile := filepath.Join(tempDir, "tfplan")
@@ -154,22 +147,16 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 	if err != nil {
 		logging.LogEnhanced(stdErr, aud)
 		logging.LogEnhanced(stdOut, aud)
-		return "", "", errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
+		return "", nil, errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
 	plan, err := os.ReadFile(planFile)
 
 	if err != nil {
-		return "", "", err
+		return "", nil, err
 	}
 
-	planCompressed, err := compress.CompressByteArray(plan)
-
-	if err != nil {
-		return "", "", err
-	}
-
-	return planFile, planCompressed, nil
+	return planFile, plan, nil
 }
 
 func generatePlanJson(tempDir string, planFile string) (string, error) {

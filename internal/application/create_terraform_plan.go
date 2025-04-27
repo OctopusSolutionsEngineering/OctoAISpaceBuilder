@@ -6,6 +6,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
@@ -15,6 +16,7 @@ func CreateTerraformPlan(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 
 	if err != nil {
+		zap.L().Error("Failed to read request body", zap.Error(err))
 		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
 		return
 	}
@@ -23,6 +25,7 @@ func CreateTerraformPlan(c *gin.Context) {
 	err = jsonapi.Unmarshal(body, &terraformInput)
 
 	if err != nil {
+		zap.L().Error("Failed to unmarshal body as JSON API", zap.Error(err))
 		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
 		return
 	}
@@ -32,6 +35,7 @@ func CreateTerraformPlan(c *gin.Context) {
 	response, err := handler.CreateTerraformPlan(server, token, apiKey, terraformInput)
 
 	if err != nil {
+		zap.L().Error("Failed to create Terraform plan", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
@@ -39,6 +43,7 @@ func CreateTerraformPlan(c *gin.Context) {
 	responseJSON, err := jsonapi.Marshal(response)
 
 	if err != nil {
+		zap.L().Error("Failed to read request body", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}

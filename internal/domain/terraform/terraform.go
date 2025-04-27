@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 )
 
+const TerraformProviderVersion = "0.42.0"
+
 func WriteOverrides(path string) error {
 	if err := WriteBackendOverride(path); err != nil {
 		return err
@@ -35,7 +37,7 @@ func WriteBackendOverride(path string) error {
 func WriteProviderOverrides(path string) error {
 	providerOverrides := `terraform {
 	  required_providers {
-		octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "0.42.0" }
+		octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "` + TerraformProviderVersion + `" }
 	  }
 	  required_version = ">= 1.6.0"
 	}`

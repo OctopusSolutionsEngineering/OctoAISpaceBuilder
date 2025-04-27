@@ -10,7 +10,10 @@ func GetPort() string {
 	// Get the port from the environment variable
 	port := os.Getenv("FUNCTIONS_CUSTOMHANDLER_PORT")
 	if port == "" {
-		port = "8080" // Default port
+		port = os.Getenv("SPACEBUILDER_FUNCTIONS_CUSTOMHANDLER_PORT")
+		if port == "" {
+			port = "8080" // Default port
+		}
 	}
 	return port
 }

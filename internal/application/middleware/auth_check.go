@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -20,6 +21,7 @@ func AuthCheck(c *gin.Context) {
 		return
 	}
 
+	zap.L().Error("No authorization token or API key provided")
 	c.IndentedJSON(http.StatusUnauthorized, "No authorization token or API key provided")
 	c.Abort()
 	return

@@ -4,6 +4,7 @@ import (
 	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
 	"net/url"
 	"strings"
@@ -25,6 +26,7 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 
 		apiURL, err := url.Parse(server)
 		if err != nil {
+			zap.L().Error("Failed to process request", zap.Error(err))
 			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to process request", err))
 			c.Abort()
 			return
@@ -45,12 +47,14 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		// host a JWKS server, and host a server that responds the API request.
 		octopusClient, err := client.NewClientWithAccessToken(nil, apiURL, token, "")
 		if err != nil {
+			zap.L().Error("Failed to open Octopus client", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 			c.Abort()
 			return
 		}
 
 		if _, err := octopusClient.Users.GetMe(); err != nil {
+			zap.L().Error("Failed to contact Octopus me endpoint", zap.Error(err))
 			c.IndentedJSON(http.StatusUnauthorized, responses.GenerateError("Failed to process request", err))
 			c.Abort()
 			return

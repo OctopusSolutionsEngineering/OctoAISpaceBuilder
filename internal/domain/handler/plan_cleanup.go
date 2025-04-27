@@ -10,7 +10,7 @@ import (
 const OldPlanThresholdMinutes = 5
 
 func RemoveOldPlans() error {
-	oldPlans, err := infrastructure.ListTerraformPlan(OldPlanThresholdMinutes)
+	oldPlans, err := infrastructure.ListPlanAzureStorageBlob(OldPlanThresholdMinutes)
 
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func RemoveOldPlans() error {
 	// Try to delete all the old plans, collecting any errors rather than returning immediately
 	deleteErrors := []error{}
 	for _, oldPlan := range oldPlans {
-		if err := infrastructure.DeleteTerraformPlan(oldPlan); err != nil {
+		if err := infrastructure.DeletePlanAzureStorageBlob(oldPlan); err != nil {
 			deleteErrors = append(deleteErrors, err)
 		}
 	}

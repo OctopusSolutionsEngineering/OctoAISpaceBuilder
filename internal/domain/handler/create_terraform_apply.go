@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/compress"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
@@ -34,37 +33,21 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	lockFileName := filepath.Join(tempDir, ".terraformApply.lock.hcl")
 	configurationFileName := filepath.Join(tempDir, "terraformApply.tf")
 
-	planContents, _, lockFile, configuration, err := infrastructure.ReadPlanAzureStorageTable(terraformApply)
+	planContents, lockFile, configuration, err := infrastructure.ReadPlanAzureStorageBlob(terraformApply.ID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	decoded, err := compress.DecompressStringToByteArray(planContents)
-
-	if err != nil {
+	if err := os.WriteFile(planFile, planContents, 0644); err != nil {
 		return nil, err
 	}
 
-	decodedLockFile, err := compress.DecompressStringToByteArray(lockFile)
-
-	if err != nil {
+	if err := os.WriteFile(lockFileName, lockFile, 0644); err != nil {
 		return nil, err
 	}
 
-	if err := os.WriteFile(planFile, decoded, 0644); err != nil {
-		return nil, err
-	}
-
-	if err := os.WriteFile(lockFileName, decodedLockFile, 0644); err != nil {
-		return nil, err
-	}
-
-	if err := os.WriteFile(lockFileName, decodedLockFile, 0644); err != nil {
-		return nil, err
-	}
-
-	if err := os.WriteFile(configurationFileName, []byte(configuration), 0644); err != nil {
+	if err := os.WriteFile(configurationFileName, configuration, 0644); err != nil {
 		return nil, err
 	}
 
@@ -114,10 +97,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		return nil, err
 	}
 
-	if err := infrastructure.DeleteTerraformPlan(infrastructure.TableEntityId{
-		RowKey:       terraformApply.PlanId,
-		PartitionKey: terraformApply.Server,
-	}); err != nil {
+	if err := infrastructure.DeletePlanAzureStorageBlob(terraformApply.PlanId); err != nil {
 		// We're not going to fail here, but we'll log the error.
 		// Any old plans will be cleaned up by the terraform plan cleanup job.
 		zap.L().Error("Failed to delete terraform plan", zap.Error(err))
