@@ -63,11 +63,13 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 			Configuration:    string(configuration),
 		})
 
+		if plan != nil {
+			t.Log(*plan.PlanText)
+		}
+
 		if err != nil {
 			t.Fatalf("Failed to create Terraform plan: %v", err)
 		}
-
-		t.Log(*plan.PlanText)
 
 		apply, err := handler.CreateTerraformApply(container.URI, "", test.ApiKey, model.TerraformApply{
 			ID:        "",
@@ -76,11 +78,13 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 			ApplyText: nil,
 		})
 
+		if apply != nil {
+			t.Log(*apply.ApplyText)
+		}
+
 		if err != nil {
 			t.Fatalf("Failed to create Terraform apply: %v", err)
 		}
-
-		t.Log(*apply.ApplyText)
 
 		return nil
 	})
