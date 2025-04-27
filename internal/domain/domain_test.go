@@ -32,7 +32,7 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 	base, err := files.CopyDir("../../terraform")
 
 	if err != nil {
-		t.Fatalf("Failed to create space: %v", err)
+		t.Fatalf("Failed to copy Terraform files: %v", err)
 	}
 
 	testFramework := test.OctopusContainerTest{}
