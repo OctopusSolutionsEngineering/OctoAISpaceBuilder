@@ -48,7 +48,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	}
 
 	if !environment.GetDisableTerraformCliConfig() {
-		if err := createTerraformRcFile(); err != nil {
+		if err := terraform.CreateTerraformRcFile(); err != nil {
 			return nil, err
 		}
 	}
@@ -245,58 +245,6 @@ func checkPlan(planJson string) error {
 	}
 
 	zap.L().Info(checkStdOut)
-
-	return nil
-}
-
-// createTerraformRcFile creates a .terraformrc file in the user's home directory
-// The providers directory structure needs to be like:
-// provider/registry.terraform.io/octopusdeploylabs/octopusdeploy/0.41.0/linux_amd64/terraform-provider-octopusdeploy_v0.41.0
-func createTerraformRcFile() error {
-	currentDir, err := os.Getwd()
-
-	if err != nil {
-		return fmt.Errorf("failed to determine current working directory: %w", err)
-	}
-
-	content := `provider_installation {
-  filesystem_mirror {
-    path    = "` + currentDir + `/provider"
-    include = ["*/*/*"]
-  }
-  direct {}
-}`
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("failed to determine user home directory: %w", err)
-	}
-
-	rcFilePath := filepath.Join(homeDir, ".terraformrc")
-
-	// Check if file already exists
-	if err := backupRcFile(rcFilePath); err != nil {
-		return err
-	}
-
-	// Write the new content
-	if err := os.WriteFile(rcFilePath, []byte(content), 0600); err != nil {
-		return fmt.Errorf("failed to write .terraformrc file: %w", err)
-	}
-
-	return nil
-}
-
-func backupRcFile(rcFilePath string) error {
-	if _, err := os.Stat(rcFilePath); err == nil {
-		// Back up existing file
-		backupPath := rcFilePath + ".backup." + time.Now().Format("20060102150405")
-		if err := os.Rename(rcFilePath, backupPath); err != nil {
-			return fmt.Errorf("failed to backup existing .terraformrc file: %w", err)
-		}
-	} else if !os.IsNotExist(err) {
-		return fmt.Errorf("failed to check if .terraformrc file exists: %w", err)
-	}
 
 	return nil
 }
