@@ -27,6 +27,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Install OPA
+        run: |
+          curl -L -o opa https://openpolicyagent.org/downloads/v1.3.0/opa_linux_amd64_static
+          sudo install -o root -g root -m 0755 opa /usr/local/bin/opa
+        shell: bash
+      - name: Install Tofu
+        run: |
+          curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o install-opentofu.sh
+          chmod +x install-opentofu.sh
+          ./install-opentofu.sh --install-method deb
+          rm -f install-opentofu.sh
+        shell: bash
+      - name: Start Azurite
+        run: docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 --restart unless-stopped mcr.microsoft.com/azure-storage/azurite
+        shell: bash
       - name: Login to Octopus Deploy
         uses: OctopusDeploy/login@v1
         with:

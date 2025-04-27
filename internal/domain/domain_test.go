@@ -1,0 +1,77 @@
+package domain
+
+import (
+	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
+	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
+	"os"
+	"testing"
+	"time"
+)
+
+// TestPopulateSpaceWithK8sProject creates a space and populates it via the domain level handlers.
+func TestPopulateSpaceWithK8sProject(t *testing.T) {
+	if err := os.Setenv("SPACEBUILDER_OPA_PATH", "opa"); err != nil {
+		t.Fatalf("Failed to set SPACEBUILDER_OPA_PATH: %v", err)
+	}
+
+	if err := os.Setenv("SPACEBUILDER_TOFU_PATH", "tofu"); err != nil {
+		t.Fatalf("Failed to set SPACEBUILDER_TOFU_PATH: %v", err)
+	}
+
+	if err := os.Setenv("SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG", "true"); err != nil {
+		t.Fatalf("Failed to set SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG: %v", err)
+	}
+
+	if err := os.Setenv("SPACEBUILDER_OPA_POLICY_PATH", "../../functions/policy/"); err != nil {
+		t.Fatalf("Failed to set SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG: %v", err)
+	}
+
+	testFramework := test.OctopusContainerTest{}
+	testFramework.ArrangeTest(t, func(t *testing.T, container *test.OctopusContainer, client *client.Client) error {
+		spaceId, err := testFramework.Act(t, container, "../../terraform", "2-localsetup", []string{})
+
+		if err != nil {
+			t.Fatalf("Failed to create space: %v", err)
+		}
+
+		configuration, err := os.ReadFile("../../terraform/k8s-example/example.tf")
+
+		if err != nil {
+			t.Fatalf("Failed to read configuration file: %v", err)
+		}
+
+		plan, err := handler.CreateTerraformPlan(container.URI, "", test.ApiKey, model.TerraformPlan{
+			ID:               "",
+			PlanBinaryBase64: nil,
+			PlanText:         nil,
+			Server:           "",
+			Created:          time.Time{},
+			SpaceId:          spaceId,
+			Configuration:    string(configuration),
+		})
+
+		if err != nil {
+			t.Fatalf("Failed to create Terraform plan: %v", err)
+		}
+
+		t.Log(*plan.PlanText)
+
+		apply, err := handler.CreateTerraformApply(container.URI, "", test.ApiKey, model.TerraformApply{
+			ID:        "",
+			PlanId:    plan.ID,
+			Server:    "",
+			ApplyText: nil,
+		})
+
+		if err != nil {
+			t.Fatalf("Failed to create Terraform apply: %v", err)
+		}
+
+		t.Log(*apply.ApplyText)
+
+		return nil
+	})
+
+}

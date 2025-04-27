@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
@@ -46,8 +47,10 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		return nil, err
 	}
 
-	if err := createTerraformRcFile(); err != nil {
-		return nil, err
+	if !environment.GetDisableTerraformCliConfig() {
+		if err := createTerraformRcFile(); err != nil {
+			return nil, err
+		}
 	}
 
 	lockFile, err := initTofu(tempDir)
@@ -98,7 +101,7 @@ func initTofu(tempDir string) ([]byte, error) {
 	zap.L().Info("Init tofu")
 
 	stdOut, stdErr, _, err := execute.Execute(
-		"binaries/tofu",
+		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
 			"init",
@@ -127,7 +130,7 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 	planFile := filepath.Join(tempDir, "tfplan")
 
 	stdOut, stdErr, _, err := execute.Execute(
-		"binaries/tofu",
+		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
 			"plan",
@@ -163,7 +166,7 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 	zap.L().Info("Generating plan JSON")
 
 	planJsonStdOut, stdErr, _, err := execute.Execute(
-		"binaries/tofu",
+		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
 			"show",
@@ -185,7 +188,7 @@ func generatePlanText(tempDir string, planFile string) (string, error) {
 	zap.L().Info("Generating plan text")
 
 	planStdOut, stdErr, _, err := execute.Execute(
-		"binaries/tofu",
+		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
 			"show",
@@ -222,14 +225,14 @@ func checkPlan(planJson string) error {
 	}
 
 	checkStdOut, _, exitCode, err := execute.Execute(
-		"binaries/opa_linux_amd64",
+		environment.GetOpaExecutable(),
 		[]string{
 			"exec",
 			"--fail",
 			"--decision",
 			"terraform/analysis/allow",
 			"--bundle",
-			"policy/",
+			environment.GetOpaPolicyPath(),
 			filepath.Join(tempDir, "plan.json")},
 		map[string]string{})
 

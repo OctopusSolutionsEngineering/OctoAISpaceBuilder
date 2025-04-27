@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
@@ -56,7 +57,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	}
 
 	_, _, _, err = execute.Execute(
-		"binaries/tofu",
+		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
 			"init",
@@ -76,7 +77,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	}
 
 	stdout, _, _, err := execute.Execute(
-		"binaries/tofu",
+		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
 			"apply",
