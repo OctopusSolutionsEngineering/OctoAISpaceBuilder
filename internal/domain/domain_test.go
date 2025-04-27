@@ -44,13 +44,13 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 		spaceId, err := testFramework.Act(t, container, base, "2-localsetup", []string{})
 
 		if err != nil {
-			t.Fatalf("Failed to create space: %v", err)
+			return err
 		}
 
 		configuration, err := os.ReadFile("../../terraform/k8s-example/example.tf")
 
 		if err != nil {
-			t.Fatalf("Failed to read configuration file: %v", err)
+			return err
 		}
 
 		plan, err := handler.CreateTerraformPlan(container.URI, "", test.ApiKey, model.TerraformPlan{
@@ -68,7 +68,7 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 		}
 
 		if err != nil {
-			t.Fatalf("Failed to create Terraform plan: %v", err)
+			return err
 		}
 
 		apply, err := handler.CreateTerraformApply(container.URI, "", test.ApiKey, model.TerraformApply{
@@ -83,7 +83,7 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 		}
 
 		if err != nil {
-			t.Fatalf("Failed to create Terraform apply: %v", err)
+			return err
 		}
 
 		return nil

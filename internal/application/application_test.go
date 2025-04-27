@@ -9,7 +9,6 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -67,11 +66,11 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 		router.POST("/api/terraformplan", CreateTerraformPlan)
 		router.POST("/api/terraformapply", CreateTerraformApply)
 
-		reponse := func() model.TerraformPlan {
+		reponse, err := func() (*model.TerraformPlan, error) {
 			configuration, err := os.ReadFile("../../terraform/k8s-example/example.tf")
 
 			if err != nil {
-				t.Fatalf("Failed to read configuration file: %v", err)
+				return nil, err
 			}
 
 			// Apply the changes
@@ -82,11 +81,18 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 			}
 
 			jsonBody, err := jsonapi.Marshal(body)
-			require.NoError(t, err)
+
+			if err != nil {
+				return nil, err
+			}
 
 			// Create test request
 			req, err := http.NewRequest(http.MethodPost, "/api/terraformplan", bytes.NewBuffer(jsonBody))
-			require.NoError(t, err)
+
+			if err != nil {
+				return nil, err
+			}
+
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("X-Octopus-Url", container.URI)
 			req.Header.Set("X-Octopus-ApiKey", test.ApiKey)
@@ -102,15 +108,23 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 
 			var response model.TerraformPlan
 			err = jsonapi.Unmarshal(w.Body.Bytes(), &response)
-			assert.NoError(t, err)
+
+			if err != nil {
+				return nil, err
+			}
+
 			assert.NotEmpty(t, response.ID)
 			assert.Equal(t, spaceId, response.SpaceId)
 
-			return response
+			return &response, nil
 		}()
 
+		if err != nil {
+			return err
+		}
+
 		// Assert response
-		func(response model.TerraformPlan) {
+		err = func(response *model.TerraformPlan) error {
 			// Plan the changes
 			applyBody := model.TerraformApply{
 				ID:        "unused",
@@ -120,11 +134,18 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 			}
 
 			applyJsonBody, err := jsonapi.Marshal(applyBody)
-			require.NoError(t, err)
+
+			if err != nil {
+				return err
+			}
 
 			// Create test request
 			applyReq, err := http.NewRequest(http.MethodPost, "/api/terraformapply", bytes.NewBuffer(applyJsonBody))
-			require.NoError(t, err)
+
+			if err != nil {
+				return err
+			}
+
 			applyReq.Header.Set("Content-Type", "application/json")
 			applyReq.Header.Set("X-Octopus-Url", container.URI)
 			applyReq.Header.Set("X-Octopus-ApiKey", test.ApiKey)
@@ -141,10 +162,16 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 			// Assert response
 			var applyResponse model.TerraformApply
 			err = jsonapi.Unmarshal(w.Body.Bytes(), &applyResponse)
-			assert.NoError(t, err)
+
+			if err != nil {
+				return err
+			}
+
 			assert.NotEmpty(t, applyResponse.ID)
+
+			return nil
 		}(reponse)
 
-		return nil
+		return err
 	})
 }
