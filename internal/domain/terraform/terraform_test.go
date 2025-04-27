@@ -30,3 +30,40 @@ func TestGenerateTerraformRC(t *testing.T) {
 	lines := strings.Split(strings.TrimSpace(content), "\n")
 	assert.GreaterOrEqual(t, len(lines), 5, "Should contain at least 5 lines")
 }
+
+func TestGenerateOverrides(t *testing.T) {
+	// Call the function under test
+	result := GenerateOverrides()
+
+	// Verify the content
+	assert.Contains(t, result, "required_providers {", "Should contain required_providers section")
+	assert.Contains(t, result, "octopusdeploy = { source = \"OctopusDeployLabs/octopusdeploy\", version = \""+TerraformProviderVersion+"\" }",
+		"Should contain correct octopusdeploy provider definition")
+	assert.Contains(t, result, "required_version = \">= 1.6.0\"", "Should contain minimum Terraform version")
+
+	// Verify the structure
+	lines := strings.Split(strings.TrimSpace(result), "\n")
+	assert.GreaterOrEqual(t, len(lines), 5, "Should contain at least 5 lines")
+
+	// Verify the provider version matches the constant
+	assert.Contains(t, result, "version = \""+TerraformProviderVersion+"\"",
+		"Provider version should match TerraformProviderVersion constant")
+}
+
+func TestGenerateStateFile(t *testing.T) {
+	// Call the function under test
+	result := GenerateStateFile()
+
+	// Verify the content
+	assert.Contains(t, result, "terraform {", "Should contain terraform block")
+	assert.Contains(t, result, "backend \"local\" {", "Should contain local backend block")
+	assert.Contains(t, result, "path = \"./.local-state\"", "Should define local state path correctly")
+
+	// Verify structure
+	lines := strings.Split(strings.TrimSpace(result), "\n")
+	assert.GreaterOrEqual(t, len(lines), 5, "Should contain at least 5 lines")
+
+	// Verify proper formatting
+	assert.True(t, strings.Contains(result, "{") && strings.Contains(result, "}"),
+		"Should contain properly formed blocks with braces")
+}

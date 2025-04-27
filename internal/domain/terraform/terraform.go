@@ -23,30 +23,38 @@ func WriteOverrides(path string) error {
 
 // WriteBackendOverride forces the use of local state. We never want to send state to the cloud.
 func WriteBackendOverride(path string) error {
-	backendOverride := `terraform {
-	  backend "local" {
-		path = "./.local-state"
-	  }
-	}`
+	backendOverride := GenerateStateFile()
 
 	filePath := filepath.Join(path, "backend_override.tf")
 
 	return os.WriteFile(filePath, []byte(backendOverride), 0644)
 }
 
+func GenerateStateFile() string {
+	return `terraform {
+	  backend "local" {
+		path = "./.local-state"
+	  }
+	}`
+}
+
 // WriteProviderOverrides defines the provider block for the Octopus Deploy provider.
 // It sets the version to the bundled provider and removes the optional providers that are not needed.
 func WriteProviderOverrides(path string) error {
-	providerOverrides := `terraform {
+	providerOverrides := GenerateOverrides()
+
+	filePath := filepath.Join(path, "provider_override.tf")
+
+	return os.WriteFile(filePath, []byte(providerOverrides), 0644)
+}
+
+func GenerateOverrides() string {
+	return `terraform {
 	  required_providers {
 		octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "` + TerraformProviderVersion + `" }
 	  }
 	  required_version = ">= 1.6.0"
 	}`
-
-	filePath := filepath.Join(path, "provider_override.tf")
-
-	return os.WriteFile(filePath, []byte(providerOverrides), 0644)
 }
 
 // createTerraformRcFile creates a .terraformrc file in the user's home directory
