@@ -162,12 +162,12 @@ jobs:
           path: coverage.html
       - name: Go Coverage Badge
         if: always()
-        uses: tj-actions/coverage-badge-go@v2
+        uses: tj-actions/coverage-badge-go@v3
         with:
           filename: coverage.out
       - name: Verify Changed files
         if: always()
-        uses: tj-actions/verify-changed-files@v17
+        uses: tj-actions/verify-changed-files@v20
         id: verify-changed-files
         with:
           files: README.md
