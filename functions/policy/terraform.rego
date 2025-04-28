@@ -9,12 +9,44 @@ import input as tfplan
 default allow := false
 
 # Don't allow any changes to non-Octopus Deploy resources
-affects_non_octopusdeploy_resources if {
+affects_non_octopusdeploy_resources[msg] if {
     some resource_change in tfplan.resource_changes
     not startswith(resource_change.type, "octopusdeploy_")
+    # Generate a failure message
+    msg := sprintf("Attempted to create type of ': %v",
+                  [resource_change.typ])
+}
+
+# Make sure all sensitive values defulat to "Change Me!"
+custom_sensitive_vars[msg] if {
+    # Get resources from planned_values
+    resource := input.planned_values.root_module.resources[_]
+
+    # Check if sensitive_values exists in the resource
+    is_object(resource.sensitive_values)
+
+    # Find all true values in sensitive_values which mark sensitive fields
+    [path, value] := walk(resource.sensitive_values)
+    value == true
+
+    # Get the corresponding value from the actual resource values
+    is_object(resource.values)
+
+    # Find the corrosponding properties under values
+    [actual_path, actual_value] := walk(resource.values)
+    actual_path == path
+
+    # Find those properties that are not set to a default value
+    actual_value != "Change Me!"
+    actual_value != null
+
+    # Generate a failure message
+    msg := sprintf("Resource %s has a sensitive value at path %v that is not 'Change Me!': %v",
+                  [resource.address, concat(".", path), actual_value])
 }
 
 # This is the combined rule we want to check
 allow if {
 	not affects_non_octopusdeploy_resources
+	count(custom_sensitive_vars) == 0
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
@@ -242,6 +243,19 @@ func checkPlan(planJson string) error {
 
 	if exitCode != 0 {
 		return fmt.Errorf("OPA check failed with exit code %d: %s", exitCode, checkStdOut)
+	}
+
+	// Parse the OPA JSON output
+	var opaResponse model.OpaResult
+	if err := json.Unmarshal([]byte(checkStdOut), &opaResponse); err != nil {
+		return fmt.Errorf("failed to parse OPA response: %w", err)
+	}
+
+	// Check the result from the parsed JSON
+	for _, result := range opaResponse.Result {
+		if !result.Result {
+			return fmt.Errorf("OPA policy check failed for %s: result is false", result.Path)
+		}
 	}
 
 	zap.L().Info(checkStdOut)
