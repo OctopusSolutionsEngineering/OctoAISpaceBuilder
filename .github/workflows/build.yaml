@@ -114,8 +114,8 @@ jobs:
           tar -xzf tofu.tar.gz -C functions/binaries
           curl -L -o functions/binaries/opa_linux_amd64 https://github.com/open-policy-agent/opa/releases/download/v1.3.0/opa_linux_amd64
           chmod +x functions/binaries/opa_linux_amd64
-          curl -L -o terraform-provider-octopusdeploy.zip https://github.com/OctopusDeployLabs/terraform-provider-octopusdeploy/releases/download/v0.42.0/terraform-provider-octopusdeploy_0.42.0_linux_amd64.zip
-          unzip terraform-provider-octopusdeploy.zip -d functions/provider/registry.opentofu.org/octopusdeploylabs/octopusdeploy/0.42.0/linux_amd64
+          curl -L -o terraform-provider-octopusdeploy.zip https://github.com/OctopusDeployLabs/terraform-provider-octopusdeploy/releases/download/v0.43.0/terraform-provider-octopusdeploy_0.43.0_linux_amd64.zip
+          unzip terraform-provider-octopusdeploy.zip -d functions/provider/registry.opentofu.org/octopusdeploylabs/octopusdeploy/0.43.0/linux_amd64
       # Note you must exclude the local.settings.json file from the zip. Otherwise, you get errors like:
       # Microsoft.Azure.WebJobs.Script: WorkerConfig for runtime: custom not found.
       - run: |

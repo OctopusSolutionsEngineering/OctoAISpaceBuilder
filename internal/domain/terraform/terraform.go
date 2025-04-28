@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const TerraformProviderVersion = "0.42.0"
+const TerraformProviderVersion = "0.43.0"
 
 func WriteOverrides(path string) error {
 	if err := WriteBackendOverride(path); err != nil {
