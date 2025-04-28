@@ -47,6 +47,6 @@ custom_sensitive_vars[msg] if {
 
 # This is the combined rule we want to check
 allow if {
-	not affects_non_octopusdeploy_resources
+	count(affects_non_octopusdeploy_resources) == 0
 	count(custom_sensitive_vars) == 0
 }
