@@ -3,18 +3,15 @@
 
 package terraform.analysis
 
-import input as tfplan
-
 # The default is to not pass validation
 default allow := false
 
 # Don't allow any changes to non-Octopus Deploy resources
 affects_non_octopusdeploy_resources[msg] if {
-    some resource_change in tfplan.resource_changes
+    resource_change := input.resource_changes[_]
     not startswith(resource_change.type, "octopusdeploy_")
     # Generate a failure message
-    msg := sprintf("Attempted to create type of ': %v",
-                  [resource_change.typ])
+    msg := sprintf("Attempted to create type of ': %v", [resource_change.type])
 }
 
 # Make sure all sensitive values defulat to "Change Me!"

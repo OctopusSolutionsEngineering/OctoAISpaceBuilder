@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/customerrors"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
@@ -254,7 +255,11 @@ func checkPlan(planJson string) error {
 	// Check the result from the parsed JSON
 	for _, result := range opaResponse.Result {
 		if !result.Result {
-			return fmt.Errorf("OPA policy check failed for %s: result is false", result.Path)
+			return customerrors.OpaValidationFailed{
+				ExitCode:   exitCode,
+				DecisionID: result.DecisionID,
+				Path:       result.Path,
+			}
 		}
 	}
 
