@@ -37,6 +37,7 @@ custom_sensitive_vars[msg] if {
     actual_value != "Change Me!"
     actual_value != "CHANGE_ME"
     actual_value != "CHANGE ME"
+    actual_value != "AWS_SECRET_KEY"
     actual_value != null
 
     # Generate a failure message
