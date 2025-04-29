@@ -35,6 +35,8 @@ custom_sensitive_vars[msg] if {
 
     # Find those properties that are not set to a default value
     actual_value != "Change Me!"
+    actual_value != "CHANGE_ME"
+    actual_value != "CHANGE ME"
     actual_value != null
 
     # Generate a failure message
