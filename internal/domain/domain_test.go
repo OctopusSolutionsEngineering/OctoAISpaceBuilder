@@ -153,6 +153,11 @@ func TestInvalidCustomSecretsProject(t *testing.T) {
 			t.Fatalf("CreateTerraformPlan should have failed")
 		}
 
+		cusErr := &customerrors.OpaValidationFailed{}
+		if !errors.As(err, cusErr) {
+			t.Fatalf("CreateTerraformPlan should have failed with OpaValidationFailed")
+		}
+
 		return nil
 	})
 }
