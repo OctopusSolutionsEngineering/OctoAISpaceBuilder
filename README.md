@@ -37,6 +37,7 @@ export SPACEBUILDER_OPA_PATH=opa
 export SPACEBUILDER_OPA_POLICY_PATH=functions/policy
 export SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG=true
 export SPACEBUILDER_TOFU_PATH=tofu
+export DISABLE_BINARIES_EXECUTABLE=true
 ```
 
 You will also need to install [Tofu](https://opentofu.org/docs/intro/install/) and [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa) locally.
