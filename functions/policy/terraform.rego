@@ -41,7 +41,7 @@ custom_sensitive_vars[msg] if {
     actual_value != null
 
     # Generate a failure message
-    msg := sprintf("Resource %s has a sensitive value at path %v that is not 'Change Me!': %v",
+    msg := sprintf("Resource %s has a sensitive value at path %v that is not a generic placholder: %v",
                   [resource.address, concat(".", path), actual_value])
 }
 
