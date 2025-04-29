@@ -255,6 +255,7 @@ func checkPlan(planJson string, server string) error {
 	// Check the result from the parsed JSON
 	for _, result := range opaResponse.Result {
 		if !result.Result {
+			logging.LogEnhanced(planJson, server)
 			logging.LogEnhanced(checkStdOut, server)
 			return customerrors.OpaValidationFailed{
 				ExitCode:   exitCode,
