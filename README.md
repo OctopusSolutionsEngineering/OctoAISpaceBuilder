@@ -30,8 +30,13 @@ DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02x
 
 The following env vars allow the service to run locally:
 ```bash
-export FUNCTIONS_CUSTOMHANDLER_PORT=8084
+export DISABLE_VALIDATION=true
+export ENHANCED_LOGGING_INSTANCES='["yourinstance.octopus.app"]'
+export SPACEBUILDER_FUNCTIONS_CUSTOMHANDLER_PORT=8084
+export SPACEBUILDER_OPA_PATH=opa
+export SPACEBUILDER_OPA_POLICY_PATH=functions/policy
 export SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG=true
+export SPACEBUILDER_TOFU_PATH=tofu
 ```
 
 You will also need to install [Tofu](https://opentofu.org/docs/intro/install/) and [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa) locally.
