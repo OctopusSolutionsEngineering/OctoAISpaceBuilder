@@ -19,7 +19,7 @@ This services forces the use of a local backend, which is not persisted between 
 Start the Azurite emulator with the following command:
 
 ```bash
-docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
 ```
 
 Set the `AzureWebJobsStorage` environment variable to:
@@ -27,3 +27,11 @@ Set the `AzureWebJobsStorage` environment variable to:
 ```
 DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
 ```
+
+The following env vars allow the service to run locally:
+```bash
+export FUNCTIONS_CUSTOMHANDLER_PORT=8084
+export SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG=true
+```
+
+You will also need to install [Tofu](https://opentofu.org/docs/intro/install/) and [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa) locally.
