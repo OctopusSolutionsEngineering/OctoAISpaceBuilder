@@ -4,6 +4,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/sha"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
@@ -76,7 +77,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		return nil, err
 	}
 
-	stdout, _, _, err := execute.Execute(
+	stdout, stderr, _, err := execute.Execute(
 		environment.GetTofuExecutable(),
 		[]string{
 			"-chdir=" + tempDir,
@@ -95,6 +96,8 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		})
 
 	if err != nil {
+		logging.LogEnhanced(stdout, server)
+		logging.LogEnhanced(stderr, server)
 		return nil, err
 	}
 

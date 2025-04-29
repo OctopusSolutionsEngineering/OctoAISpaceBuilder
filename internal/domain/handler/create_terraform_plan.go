@@ -84,7 +84,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		return nil, err
 	}
 
-	if err := checkPlan(planJson); err != nil {
+	if err := checkPlan(planJson, server); err != nil {
 		return nil, err
 	}
 
@@ -207,7 +207,7 @@ func generatePlanText(tempDir string, planFile string) (string, error) {
 	return planStdOut, nil
 }
 
-func checkPlan(planJson string) error {
+func checkPlan(planJson string, server string) error {
 	zap.L().Info("Checking plan with OPA")
 
 	tempDir, err := files.CreateTempDir()
@@ -255,6 +255,7 @@ func checkPlan(planJson string) error {
 	// Check the result from the parsed JSON
 	for _, result := range opaResponse.Result {
 		if !result.Result {
+			logging.LogEnhanced(checkStdOut, server)
 			return customerrors.OpaValidationFailed{
 				ExitCode:   exitCode,
 				DecisionID: result.DecisionID,
