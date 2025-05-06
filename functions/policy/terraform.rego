@@ -38,11 +38,14 @@ custom_sensitive_vars[msg] if {
     actual_value != "CHANGE_ME"
     actual_value != "CHANGE ME"
     actual_value != "AWS_SECRET_KEY"
-    actual_value != "x-access-token"
 
     # Feed usernames have been flagged as sensitive, so we include a couple of exceptions here
+    actual_value != "x-access-token"
     actual_value != "username"
     actual_value != "mcasperson"
+
+    # Variable references are ok
+    not regex.match(`^#\{[^}]+\}$`, actual_value)
 
     actual_value != null
 
