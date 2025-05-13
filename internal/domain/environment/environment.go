@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"go.uber.org/zap"
 	"os"
+	"strings"
 )
 
 func GetPort() string {
@@ -24,7 +25,7 @@ func DisableValidation() bool {
 	if disableValidation == "" {
 		return false // Default to false if not set
 	}
-	return disableValidation == "true"
+	return strings.ToLower(disableValidation) == "true"
 }
 
 // GetEnhancedLoggingInstances returns a list of instances for enhanced logging.

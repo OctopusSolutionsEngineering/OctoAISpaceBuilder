@@ -1,6 +1,9 @@
 package environment
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 func DisableMakeBinariesExecutable() bool {
 	// Get the disable validation flag from the environment variable
@@ -8,5 +11,5 @@ func DisableMakeBinariesExecutable() bool {
 	if disableBinariesExecutable == "" {
 		return false // Default to false if not set
 	}
-	return disableBinariesExecutable == "true"
+	return strings.ToLower(disableBinariesExecutable) == "true"
 }
