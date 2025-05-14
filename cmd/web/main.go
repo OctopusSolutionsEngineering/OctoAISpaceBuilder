@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"go.uber.org/zap"
 	"os"
 )
 
 func main() {
+	logging.ConfigureZapLogger()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		zap.L().Error(err.Error())
