@@ -23,11 +23,11 @@ func (h *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 
 func GetHttpClient(octopusUrl string) (*http.Client, error) {
 	if !isDirectlyAccessibleOctopusInstance(octopusUrl) {
-		fmt.Print("[SPACEBUILDER] Enabled Octopus AI Assistant redirection service")
+		fmt.Println("[SPACEBUILDER] Enabled Octopus AI Assistant redirection service")
 		return createHttpClient(octopusUrl)
 	}
 
-	fmt.Print("[SPACEBUILDER] Did not enable Octopus AI Assistant redirection service")
+	fmt.Println("[SPACEBUILDER] Did not enable Octopus AI Assistant redirection service")
 
 	return nil, nil
 }
