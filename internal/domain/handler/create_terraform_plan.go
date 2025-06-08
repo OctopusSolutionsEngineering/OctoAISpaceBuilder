@@ -84,6 +84,8 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		return nil, err
 	}
 
+	logging.LogEnhanced(planJson, server)
+
 	if err := checkPlan(planJson, server); err != nil {
 		return nil, err
 	}
@@ -93,6 +95,8 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	if err != nil {
 		return nil, err
 	}
+
+	logging.LogEnhanced(planText, server)
 
 	response.PlanText = &planText
 
