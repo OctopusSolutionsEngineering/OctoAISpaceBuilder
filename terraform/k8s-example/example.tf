@@ -11,7 +11,7 @@ provider "external" {
 terraform {
 
   required_providers {
-    octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "0.43.0" }
+    octopusdeploy = { source = "OctopusDeploy/octopusdeploy", version = "1.0.1" }
     shell         = { source = "scottwinkler/shell", version = "1.7.10" }
     external      = { source = "hashicorp/external", version = "2.3.4" }
   }
