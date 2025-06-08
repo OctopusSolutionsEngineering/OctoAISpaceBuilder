@@ -37,7 +37,7 @@ func TestGenerateOverrides(t *testing.T) {
 
 	// Verify the content
 	assert.Contains(t, result, "required_providers {", "Should contain required_providers section")
-	assert.Contains(t, result, "octopusdeploy = { source = \"OctopusDeployLabs/octopusdeploy\", version = \""+TerraformProviderVersion+"\" }",
+	assert.Contains(t, result, "octopusdeploy = { source = \"OctopusDeploy/octopusdeploy\", version = \""+TerraformProviderVersion+"\" }",
 		"Should contain correct octopusdeploy provider definition")
 	assert.Contains(t, result, "required_version = \">= 1.6.0\"", "Should contain minimum Terraform version")
 

@@ -59,7 +59,7 @@ func GenerateOverrides() string {
 
 // createTerraformRcFile creates a .terraformrc file in the user's home directory
 // The providers directory structure needs to be like:
-// provider/registry.terraform.io/octopusdeploylabs/octopusdeploy/0.41.0/linux_amd64/terraform-provider-octopusdeploy_v0.41.0
+// provider/registry.terraform.io/octopusdeploy/octopusdeploy/0.41.0/linux_amd64/terraform-provider-octopusdeploy_v0.41.0
 func CreateTerraformRcFile() error {
 	content, err := GenerateTerraformRC()
 
