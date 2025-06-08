@@ -109,14 +109,20 @@ jobs:
           GOMAXPROCS: 2
           LICENSE: ${{ secrets.LICENSE }}
           AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
+      - name: Build patched version of TF provider
+        run: |
+          git clone https://github.com/OctopusDeploy/terraform-provider-octopusdeploy.git
+          cd terraform-provider-octopusdeploy
+          git checkout mattc/spacebuilder
+          go get ./...
+          go build -o terraform-provider-octopusdeploy
       - name: Download binaries
         run: |
           curl -L -o tofu.tar.gz https://github.com/opentofu/opentofu/releases/download/v1.9.0/tofu_1.9.0_linux_amd64.tar.gz
           tar -xzf tofu.tar.gz -C functions/binaries
           curl -L -o functions/binaries/opa_linux_amd64 https://github.com/open-policy-agent/opa/releases/download/v1.3.0/opa_linux_amd64
           chmod +x functions/binaries/opa_linux_amd64
-          curl -L -o terraform-provider-octopusdeploy.zip https://github.com/OctopusDeployLabs/terraform-provider-octopusdeploy/releases/download/v0.43.0/terraform-provider-octopusdeploy_0.43.0_linux_amd64.zip
-          unzip terraform-provider-octopusdeploy.zip -d functions/provider/registry.opentofu.org/octopusdeploylabs/octopusdeploy/0.43.0/linux_amd64
+          cp terraform-provider-octopusdeploy/terraform-provider-octopusdeploy functions/provider/registry.opentofu.org/octopusdeploylabs/octopusdeploy/1.0.1/linux_amd64/terraform-provider-octopusdeploy_v1.0.1
       # Note you must exclude the local.settings.json file from the zip. Otherwise, you get errors like:
       # Microsoft.Azure.WebJobs.Script: WorkerConfig for runtime: custom not found.
       - run: |

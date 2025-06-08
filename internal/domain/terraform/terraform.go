@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const TerraformProviderVersion = "0.43.0"
+const TerraformProviderVersion = "1.0.1"
 
 func WriteOverrides(path string) error {
 	if err := WriteBackendOverride(path); err != nil {
@@ -51,7 +51,7 @@ func WriteProviderOverrides(path string) error {
 func GenerateOverrides() string {
 	return `terraform {
 	  required_providers {
-		octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "` + TerraformProviderVersion + `" }
+		octopusdeploy = { source = "OctopusDeploy/octopusdeploy", version = "` + TerraformProviderVersion + `" }
 	  }
 	  required_version = ">= 1.6.0"
 	}`
