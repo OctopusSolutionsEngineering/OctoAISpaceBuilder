@@ -95,9 +95,10 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 			"TF_VAR_octopus_server": "",
 		})
 
+	logging.LogEnhanced(stdout, server)
+	logging.LogEnhanced(stderr, server)
+
 	if err != nil {
-		logging.LogEnhanced(stdout, server)
-		logging.LogEnhanced(stderr, server)
 		return nil, err
 	}
 

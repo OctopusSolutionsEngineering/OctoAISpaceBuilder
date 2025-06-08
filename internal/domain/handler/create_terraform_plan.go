@@ -149,9 +149,10 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 			"TF_VAR_octopus_server": "",
 		})
 
+	logging.LogEnhanced(stdErr, aud)
+	logging.LogEnhanced(stdOut, aud)
+
 	if err != nil {
-		logging.LogEnhanced(stdErr, aud)
-		logging.LogEnhanced(stdOut, aud)
 		return "", nil, errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
