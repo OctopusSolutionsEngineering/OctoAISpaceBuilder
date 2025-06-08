@@ -1,19 +1,11 @@
 provider "octopusdeploy" {
   space_id = "${trimspace(var.octopus_space_id)}"
 }
-provider "shell" {
-  interpreter        = ["pwsh", "-Command"]
-  enable_parallelism = false
-}
-provider "external" {
-}
 
 terraform {
 
   required_providers {
     octopusdeploy = { source = "OctopusDeploy/octopusdeploy", version = "1.0.1" }
-    shell         = { source = "scottwinkler/shell", version = "1.7.10" }
-    external      = { source = "hashicorp/external", version = "2.3.4" }
   }
   required_version = ">= 1.6.0"
 }
@@ -84,7 +76,7 @@ data "octopusdeploy_environments" "environment_development__security_" {
 resource "octopusdeploy_environment" "environment_development__security_" {
   count                        = "${length(data.octopusdeploy_environments.environment_development__security_.environments) != 0 ? 0 : 1}"
   name                         = "Development (Security)"
-  description                  = "Used to scan the development releases for security issues. This resource is created and managed by the [Octopus Terraform provider](https://registry.terraform.io/providers/OctopusDeployLabs/octopusdeploy/latest/docs). The Terraform files can be found in the [GitHub repo](https://github.com/mcasperson/AppBuilder-EKS)."
+  description                  = "Used to scan the development releases for security issues. This resource is created and managed by the [Octopus Terraform provider](https://registry.terraform.io/providers/OctopusDeploy/octopusdeploy/latest/docs). The Terraform files can be found in the [GitHub repo](https://github.com/mcasperson/AppBuilder-EKS)."
   allow_dynamic_infrastructure = true
   use_guided_failure           = false
 
@@ -142,7 +134,7 @@ data "octopusdeploy_environments" "environment_production__security_" {
 resource "octopusdeploy_environment" "environment_production__security_" {
   count                        = "${length(data.octopusdeploy_environments.environment_production__security_.environments) != 0 ? 0 : 1}"
   name                         = "Production (Security)"
-  description                  = "Used to scan the productions releases for security issues. This resource is created and managed by the [Octopus Terraform provider](https://registry.terraform.io/providers/OctopusDeployLabs/octopusdeploy/latest/docs). The Terraform files can be found in the [GitHub repo](https://github.com/mcasperson/AppBuilder-EKS)."
+  description                  = "Used to scan the productions releases for security issues. This resource is created and managed by the [Octopus Terraform provider](https://registry.terraform.io/providers/OctopusDeploy/octopusdeploy/latest/docs). The Terraform files can be found in the [GitHub repo](https://github.com/mcasperson/AppBuilder-EKS)."
   allow_dynamic_infrastructure = true
   use_guided_failure           = false
 

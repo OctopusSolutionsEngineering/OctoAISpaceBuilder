@@ -1,19 +1,11 @@
 provider "octopusdeploy" {
   space_id = "${trimspace(var.octopus_space_id)}"
 }
-provider "shell" {
-  interpreter        = ["pwsh", "-Command"]
-  enable_parallelism = false
-}
-provider "external" {
-}
 
 terraform {
 
   required_providers {
     octopusdeploy = { source = "OctopusDeploy/octopusdeploy", version = "1.0.1" }
-    shell         = { source = "scottwinkler/shell", version = "1.7.10" }
-    external      = { source = "hashicorp/external", version = "2.3.4" }
   }
   required_version = ">= 1.6.0"
 }
