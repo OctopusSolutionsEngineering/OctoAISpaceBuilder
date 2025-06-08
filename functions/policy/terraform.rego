@@ -54,8 +54,30 @@ custom_sensitive_vars[msg] if {
                   [resource.address, concat(".", path), actual_value])
 }
 
+multiple_providers[msg] if {
+    # provider_config must only have 'octopusdeploy' as key
+    keys := object.keys(input.configuration.provider_config)
+    count(keys) != 1
+    msg := "provider_config must only contain the 'octopusdeploy' property"
+}
+
+not_octopus_provider[msg] if {
+    keys := object.keys(input.configuration.provider_config)
+    keys[0] != "octopusdeploy"
+    msg := "provider_config must only contain the 'octopusdeploy' property"
+}
+
+provider_full_name_not_octopus[msg] if {
+    # full_name must match exactly
+    input.configuration.provider_config.octopusdeploy.full_name != "registry.opentofu.org/octopusdeploy/octopusdeploy"
+    msg := "provider_config.octopusdeploy.full_name must be 'registry.opentofu.org/octopusdeploy/octopusdeploy'"
+}
+
 # This is the combined rule we want to check
 allow if {
 	count(affects_non_octopusdeploy_resources) == 0
 	count(custom_sensitive_vars) == 0
+	count(multiple_providers) == 0
+	count(not_octopus_provider) == 0
+	count(provider_full_name_not_octopus) == 0
 }

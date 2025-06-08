@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/router"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
@@ -38,6 +39,15 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 			return
 		}
 
+		routerClient, err := router.GetHttpClient(server)
+
+		if err != nil {
+			zap.L().Error("Failed to create HTTP client", zap.Error(err))
+			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+			c.Abort()
+			return
+		}
+
 		// Use the token to look up the user. This is not foolproof - you could supply any valid JWT token
 		// with an audience claim that points to a server that responds to this API request.
 		// We can't prove that anyone submitting feedback is a genuine Octopus user.
@@ -45,7 +55,7 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		// Since we store the audience in the feedback items, we can filter out bad requests later.
 		// It also raises the bar for anyone looking to abuse the API, as you would need to generate valid JWTs,
 		// host a JWKS server, and host a server that responds the API request.
-		octopusClient, err := client.NewClientWithAccessToken(nil, apiURL, token, "")
+		octopusClient, err := client.NewClientWithAccessToken(routerClient, apiURL, token, "")
 		if err != nil {
 			zap.L().Error("Failed to open Octopus client", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
