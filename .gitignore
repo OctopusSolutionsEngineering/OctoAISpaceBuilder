@@ -48,3 +48,6 @@ main
 **/terraform.tfstate
 **/terraform.tfstate.backup
 **/.terraform/
+
+.vscode/
+cmd/web/__debug_bin*

@@ -1,10 +1,13 @@
 package environment
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 func GetDisableTerraformCliConfig() bool {
 	// Check if the environment variable is set to "true"
-	if os.Getenv("SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG") == "true" {
+	if strings.ToLower(os.Getenv("SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG")) == "true" {
 		return true
 	}
 
