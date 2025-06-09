@@ -116,6 +116,9 @@ jobs:
           git checkout mattc/spacebuilder
           go get ./...
           go build -o terraform-provider-octopusdeploy
+        env:
+          GOOS: linux
+          GOARCH: amd64
       - name: Download binaries
         run: |
           curl -L -o tofu.tar.gz https://github.com/opentofu/opentofu/releases/download/v1.9.0/tofu_1.9.0_linux_amd64.tar.gz
