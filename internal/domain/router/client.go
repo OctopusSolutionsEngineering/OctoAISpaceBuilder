@@ -2,7 +2,7 @@ package router
 
 import (
 	"errors"
-	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"net/url"
 	"os"
@@ -23,11 +23,11 @@ func (h *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 
 func GetHttpClient(octopusUrl *url.URL) (*http.Client, *url.URL, error) {
 	if !isDirectlyAccessibleOctopusInstance(octopusUrl) {
-		fmt.Println("[SPACEBUILDER] Enabled Octopus AI Assistant redirection service")
+		zap.L().Info("Enabled Octopus AI Assistant redirection service")
 		return createHttpClient(octopusUrl)
 	}
 
-	fmt.Println("[SPACEBUILDER] Did not enable Octopus AI Assistant redirection service")
+	zap.L().Info("Did not enable Octopus AI Assistant redirection service")
 
 	return nil, octopusUrl, nil
 }

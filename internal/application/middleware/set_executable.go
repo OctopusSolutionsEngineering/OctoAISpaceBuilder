@@ -17,22 +17,22 @@ func MakeExecutable(c *gin.Context) {
 		return
 	}
 
-	cwd, err := os.Getwd()
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		zap.L().Error("Failed to get the current working directory", zap.Error(err))
+		zap.L().Error("Failed to get the home directory", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		c.Abort()
 		return
 	}
 
-	if err := execute.MakeAllExecutable(filepath.Join(cwd, "binaries")); err != nil {
+	if err := execute.MakeAllExecutable(filepath.Join(homeDir, "binaries")); err != nil {
 		zap.L().Error("Failed to make binaries executable", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		c.Abort()
 		return
 	}
 
-	if err := execute.MakeAllExecutable(filepath.Join(cwd, "provider")); err != nil {
+	if err := execute.MakeAllExecutable(filepath.Join(homeDir, "provider")); err != nil {
 		zap.L().Error("Failed to make provider executable", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		c.Abort()
