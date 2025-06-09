@@ -5,7 +5,7 @@ step "deploy-with-cli" {
         environments = ["production"]
         properties = {
             Octopus.Action.Template.Id = "ActionTemplates-4321"
-            Octopus.Action.Template.Version = "6"
+            Octopus.Action.Template.Version = "7"
             Packages.FunctionApp = "{\"PackageId\":\"spacebuilder_azure\",\"FeedId\":\"octopus-server-built-in\"}"
         }
         worker_pool = "hosted-ubuntu"
