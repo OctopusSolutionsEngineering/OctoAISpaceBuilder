@@ -14,6 +14,13 @@ This services forces the use of a local backend, which is not persisted between 
 * The client can not send variable values as separate files.
 * Old plan records are deleted after 5 minutes.
 
+## Terraform Provider
+
+We use a forked version of the Octopus Terraform Provider to support routing requests to the Azure Function Router. The
+provider is maintained in the branch [mattc/spacebuilder](https://github.com/OctopusDeploy/terraform-provider-octopusdeploy/pull/19).
+
+This branch is pulled and built by the workflow.
+
 ## Testing
 
 Start the Azurite emulator with the following command:
