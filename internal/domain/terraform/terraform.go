@@ -3,6 +3,7 @@ package terraform
 import (
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
+	"go.uber.org/zap"
 	"os"
 	"path/filepath"
 	"time"
@@ -69,6 +70,8 @@ func CreateTerraformRcFile() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to generate terraform rc file content: %w", err)
 	}
+
+	zap.L().Info("Generated terraform rc file: " + content)
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
