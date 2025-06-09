@@ -2,6 +2,7 @@ package terraform
 
 import (
 	"fmt"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"os"
 	"path/filepath"
 	"time"
@@ -92,7 +93,7 @@ func CreateTerraformRcFile() (string, error) {
 // GenerateTerraformRC created a CLI config file prevents providers from being downloaded.
 // See https://github.com/hashicorp/terraform/issues/33698
 func GenerateTerraformRC() (string, error) {
-	homeDir, err := os.UserHomeDir()
+	installDir, err := environment.GetInstallationDirectory()
 
 	if err != nil {
 		return "", err
@@ -100,7 +101,7 @@ func GenerateTerraformRC() (string, error) {
 
 	return `provider_installation {
   filesystem_mirror {
-    path    = "` + homeDir + `/provider"
+    path    = "` + installDir + `/provider"
     include = ["*/*/*"]
   }
   direct {exclude = ["*/*/*"]}
