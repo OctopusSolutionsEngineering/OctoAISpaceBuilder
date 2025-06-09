@@ -3,6 +3,7 @@ package execute
 import (
 	"bytes"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -67,6 +68,7 @@ func MakeAllExecutable(directory string) error {
 			if err := MakeExecutable(path); err != nil {
 				return fmt.Errorf("failed to make %s executable: %w", path, err)
 			}
+			zap.L().Info("Made the file executable: " + path)
 		}
 
 		return nil
