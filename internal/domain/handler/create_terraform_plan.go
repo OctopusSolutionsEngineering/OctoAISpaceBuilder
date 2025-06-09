@@ -115,6 +115,7 @@ func initTofu(tempDir string) ([]byte, error) {
 			"-no-color"},
 		map[string]string{
 			"TF_INPUT": "0",
+			"TF_LOG":   "INFO",
 		})
 
 	if err != nil {
