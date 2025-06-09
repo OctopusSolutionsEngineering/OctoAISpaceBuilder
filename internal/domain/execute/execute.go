@@ -62,6 +62,7 @@ func MakeAllExecutable(directory string) error {
 
 		// Skip directories
 		if info.IsDir() {
+			zap.L().Info("Scanning " + path + " for files to make executable")
 			return nil
 		}
 
