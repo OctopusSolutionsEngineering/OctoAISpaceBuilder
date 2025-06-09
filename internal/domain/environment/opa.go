@@ -1,6 +1,9 @@
 package environment
 
-import "os"
+import (
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
+	"os"
+)
 
 func GetOpaExecutable() string {
 	if os.Getenv("SPACEBUILDER_OPA_PATH") != "" {
@@ -16,4 +19,16 @@ func GetOpaPolicyPath() string {
 	}
 
 	return "policy/"
+}
+
+func GetCombinedOpaPolicyPath() (string, error) {
+	installDir, err := GetInstallationDirectory()
+
+	if err != nil {
+		return "", err
+	}
+
+	policyPath := GetOpaPolicyPath()
+
+	return files.GetAbsoluteOrRelativePath(policyPath, installDir), nil
 }

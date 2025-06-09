@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"os"
 	"strings"
 )
@@ -21,4 +22,16 @@ func GetTerraformProvidersPath() string {
 	}
 
 	return "provider"
+}
+
+func GetCombinedTerraformProvidersPath() (string, error) {
+	installDir, err := GetInstallationDirectory()
+
+	if err != nil {
+		return "", err
+	}
+
+	providerPath := GetTerraformProvidersPath()
+
+	return files.GetAbsoluteOrRelativePath(providerPath, installDir), nil
 }

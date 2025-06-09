@@ -49,13 +49,13 @@ func main() {
 		For example, missing policy files leads to OPA hanging indefinitely.
 		This helps people running the service locally to ensure they have the correct files in place.
 	*/
-	if err := validation.TestOpaPolicyInstallation(installDir); err != nil {
+	if err := validation.TestOpaPolicyInstallation(); err != nil {
 		zap.L().Error(err.Error())
 		return
 	}
 
 	if !environment.GetDisableTerraformCliConfig() {
-		if err := validation.TestFileSystemProviderInstallation(installDir); err != nil {
+		if err := validation.TestFileSystemProviderInstallation(); err != nil {
 			zap.L().Error(err.Error())
 			return
 		}

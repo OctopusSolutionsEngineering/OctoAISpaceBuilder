@@ -242,7 +242,7 @@ func checkPlan(planJson string, server string) error {
 		return err
 	}
 
-	installDir, err := environment.GetInstallationDirectory()
+	policyPath, err := environment.GetCombinedOpaPolicyPath()
 
 	if err != nil {
 		return err
@@ -256,7 +256,7 @@ func checkPlan(planJson string, server string) error {
 			"--decision",
 			"terraform/analysis/allow",
 			"--bundle",
-			files.GetAbsoluteOrRelativePath(environment.GetOpaPolicyPath(), installDir),
+			policyPath,
 			filepath.Join(tempDir, "plan.json")},
 		map[string]string{})
 
