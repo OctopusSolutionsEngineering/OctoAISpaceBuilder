@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -57,34 +58,36 @@ func GenerateOverrides() string {
 	}`
 }
 
-// createTerraformRcFile creates a .terraformrc file in the user's home directory
+// createTerraformRcFile creates a CLI configuration file for Terraform.
+// This file must be referecned using the TF_CLI_CONFIG_FILE environment variable.
+// https://opentofu.org/docs/cli/config/config-file/
 // The providers directory structure needs to be like:
 // provider/registry.terraform.io/octopusdeploy/octopusdeploy/0.41.0/linux_amd64/terraform-provider-octopusdeploy_v0.41.0
-func CreateTerraformRcFile() error {
+func CreateTerraformRcFile() (string, error) {
 	content, err := GenerateTerraformRC()
 
 	if err != nil {
-		return fmt.Errorf("failed to generate terraform rc file content: %w", err)
+		return "", fmt.Errorf("failed to generate terraform rc file content: %w", err)
 	}
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return fmt.Errorf("failed to determine user home directory: %w", err)
+		return "", fmt.Errorf("failed to determine user home directory: %w", err)
 	}
 
-	rcFilePath := filepath.Join(homeDir, ".terraformrc")
+	rcFilePath := filepath.Join(homeDir, "cliconfig.tfrc")
 
 	// Check if file already exists
 	if err := BackupRcFile(rcFilePath); err != nil {
-		return err
+		return "", err
 	}
 
 	// Write the new content
 	if err := os.WriteFile(rcFilePath, []byte(content), 0600); err != nil {
-		return fmt.Errorf("failed to write .terraformrc file: %w", err)
+		return "", fmt.Errorf("failed to write cliconfig.tfrc file: %w", err)
 	}
 
-	return nil
+	return rcFilePath, nil
 }
 
 // GenerateTerraformRC created a CLI config file prevents providers from being downloaded.
@@ -96,6 +99,10 @@ func GenerateTerraformRC() (string, error) {
 		return "", err
 	}
 
+	if err := testFileSystemProviderInstallation(currentDir); err != nil {
+		return "", err
+	}
+
 	return `provider_installation {
   filesystem_mirror {
     path    = "` + currentDir + `/provider"
@@ -104,6 +111,17 @@ func GenerateTerraformRC() (string, error) {
   direct {}
 }`, nil
 
+}
+
+// testFileSystemProviderInstallation is a sanity check to ensure the filesystem provider installation is correct.
+func testFileSystemProviderInstallation(currentDir string) error {
+	octopusProvidersDir := filepath.Join(currentDir, "provider", "registry.opentofu.org", "octopusdeploy", "octopusdeploy", TerraformProviderVersion, "linux_amd64")
+
+	if _, err := os.Stat(octopusProvidersDir); os.IsNotExist(err) {
+		return errors.New("directory " + octopusProvidersDir + " does not exist")
+	}
+
+	return nil
 }
 
 func BackupRcFile(rcFilePath string) error {

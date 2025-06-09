@@ -49,19 +49,22 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		return nil, err
 	}
 
+	var cliConfigFile = ""
 	if !environment.GetDisableTerraformCliConfig() {
-		if err := terraform.CreateTerraformRcFile(); err != nil {
+		cliConfigFile, err = terraform.CreateTerraformRcFile()
+
+		if err != nil {
 			return nil, err
 		}
 	}
 
-	lockFile, err := initTofu(tempDir)
+	lockFile, err := initTofu(cliConfigFile, tempDir)
 
 	if err != nil {
 		return nil, err
 	}
 
-	planFile, planBinary, err := generatePlan(tempDir, token, apiKey, server, terraformInput.SpaceId)
+	planFile, planBinary, err := generatePlan(cliConfigFile, tempDir, token, apiKey, server, terraformInput.SpaceId)
 
 	if err != nil {
 		return nil, err
@@ -103,7 +106,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	return &response, nil
 }
 
-func initTofu(tempDir string) ([]byte, error) {
+func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 	zap.L().Info("Init tofu")
 
 	stdOut, stdErr, _, err := execute.Execute(
@@ -114,8 +117,9 @@ func initTofu(tempDir string) ([]byte, error) {
 			"-input=false",
 			"-no-color"},
 		map[string]string{
-			"TF_INPUT": "0",
-			"TF_LOG":   "INFO",
+			"TF_INPUT":           "0",
+			"TF_LOG":             "INFO",
+			"TF_CLI_CONFIG_FILE": cliConfigFile,
 		})
 
 	if err != nil {
@@ -131,7 +135,7 @@ func initTofu(tempDir string) ([]byte, error) {
 	return lockFile, nil
 }
 
-func generatePlan(tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, error) {
+func generatePlan(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, error) {
 	zap.L().Info("Generating plan for " + aud)
 
 	planFile := filepath.Join(tempDir, "tfplan")
@@ -151,6 +155,7 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 			"OCTOPUS_URL":                 aud,
 			"TF_INPUT":                    "0",
 			"TF_LOG":                      "INFO",
+			"TF_CLI_CONFIG_FILE":          cliConfigFile,
 			"TF_VAR_octopus_apikey":       "",
 			"TF_VAR_octopus_server":       "",
 			"REDIRECTION_SERVICE_API_KEY": os.Getenv("REDIRECTION_SERVICE_API_KEY"),

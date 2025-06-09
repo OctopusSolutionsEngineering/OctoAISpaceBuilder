@@ -57,6 +57,15 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		return nil, err
 	}
 
+	var cliConfigFile = ""
+	if !environment.GetDisableTerraformCliConfig() {
+		cliConfigFile, err = terraform.CreateTerraformRcFile()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	_, _, _, err = execute.Execute(
 		environment.GetTofuExecutable(),
 		[]string{
@@ -65,8 +74,9 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 			"-input=false",
 			"-no-color"},
 		map[string]string{
-			"TF_INPUT": "0",
-			"TF_LOG":   "INFO",
+			"TF_INPUT":           "0",
+			"TF_LOG":             "INFO",
+			"TF_CLI_CONFIG_FILE": cliConfigFile,
 		})
 
 	if err != nil {
@@ -88,6 +98,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 			"OCTOPUS_API_KEY":             apiKey,
 			"TF_INPUT":                    "0",
 			"TF_LOG":                      "INFO",
+			"TF_CLI_CONFIG_FILE":          cliConfigFile,
 			"TF_VAR_octopus_apikey":       "",
 			"TF_VAR_octopus_server":       "",
 			"REDIRECTION_SERVICE_API_KEY": os.Getenv("REDIRECTION_SERVICE_API_KEY"),
