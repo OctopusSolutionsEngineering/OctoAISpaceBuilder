@@ -31,11 +31,16 @@ func GetInstallationDirectory() (string, error) {
 	}
 
 	if IsInAzureFunctions() {
-		// In Azure Functions, everything in in the current working directory
+		// In Azure Functions, everything is in the current working directory
 		return cwd, nil
 	}
 
-	// When running locally, the policies and other files are in the "functions" directory
+	// When running locally, the policies and other files are in the "functions" directory.
+	// This assumes that most people will run this service locally with the working directory set to the root of the project.
+	// You can also define absolute paths for the "policy" and "provider" directories in the environment variables
+	// SPACEBUILDER_TERRAFORM_PROVIDERS and SPACEBUILDER_OPA_POLICY_PATH.
+	// Note that tests will often use the current working directory of their test file. This means tests need to set
+	// absolute paths for the policy and provider directories.
 	return filepath.Join(cwd, "functions"), nil
 }
 
