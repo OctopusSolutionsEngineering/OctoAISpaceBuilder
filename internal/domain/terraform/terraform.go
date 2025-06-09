@@ -103,7 +103,7 @@ func GenerateTerraformRC() (string, error) {
     path    = "` + currentDir + `/provider"
     include = ["*/*/*"]
   }
-  direct {}
+  direct {exclude = ["*/*/*"]}
 }`, nil
 
 }

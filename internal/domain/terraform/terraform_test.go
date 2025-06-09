@@ -24,7 +24,7 @@ func TestGenerateTerraformRC(t *testing.T) {
 	assert.Contains(t, content, "filesystem_mirror {", "Should contain filesystem_mirror section")
 	assert.Contains(t, content, "path    = \""+currentDir+"/provider\"", "Should contain correct provider path")
 	assert.Contains(t, content, "include = [\"*/*/*\"]", "Should include all providers")
-	assert.Contains(t, content, "direct {}", "Should contain direct provider section")
+	assert.Contains(t, content, "direct {exclude = [\"*/*/*\"]}", "Should contain direct provider section")
 
 	// Verify overall structure
 	lines := strings.Split(strings.TrimSpace(content), "\n")
