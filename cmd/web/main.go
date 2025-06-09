@@ -5,6 +5,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/validation"
 	"go.uber.org/zap"
 	"os"
 )
@@ -26,6 +27,16 @@ func main() {
 	zap.L().Info("Disable setting binary execution flag: " + fmt.Sprint(environment.DisableMakeBinariesExecutable()))
 	zap.L().Info("Enhanced logging instance: " + fmt.Sprint(environment.GetEnhancedLoggingInstances()))
 	zap.L().Info("Port: " + fmt.Sprint(environment.GetPort()))
+
+	if err := validation.TestOpaPolicyInstallation(cwd); err != nil {
+		zap.L().Error(err.Error())
+		return
+	}
+
+	if err := validation.TestFileSystemProviderInstallation(cwd); err != nil {
+		zap.L().Error(err.Error())
+		return
+	}
 
 	if err := application.StartServer(); err != nil {
 		zap.L().Error(err.Error())

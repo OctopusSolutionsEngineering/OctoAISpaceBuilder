@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -99,10 +98,6 @@ func GenerateTerraformRC() (string, error) {
 		return "", err
 	}
 
-	if err := testFileSystemProviderInstallation(currentDir); err != nil {
-		return "", err
-	}
-
 	return `provider_installation {
   filesystem_mirror {
     path    = "` + currentDir + `/provider"
@@ -111,17 +106,6 @@ func GenerateTerraformRC() (string, error) {
   direct {}
 }`, nil
 
-}
-
-// testFileSystemProviderInstallation is a sanity check to ensure the filesystem provider installation is correct.
-func testFileSystemProviderInstallation(currentDir string) error {
-	octopusProvidersDir := filepath.Join(currentDir, "provider", "registry.opentofu.org", "octopusdeploy", "octopusdeploy", TerraformProviderVersion, "linux_amd64")
-
-	if _, err := os.Stat(octopusProvidersDir); os.IsNotExist(err) {
-		return errors.New("directory " + octopusProvidersDir + " does not exist")
-	}
-
-	return nil
 }
 
 func BackupRcFile(rcFilePath string) error {
