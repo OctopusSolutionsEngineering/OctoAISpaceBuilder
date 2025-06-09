@@ -87,6 +87,8 @@ func CreateTerraformRcFile() error {
 	return nil
 }
 
+// GenerateTerraformRC created a CLI config file prevents providers from being downloaded.
+// See https://github.com/hashicorp/terraform/issues/33698
 func GenerateTerraformRC() (string, error) {
 	currentDir, err := os.Getwd()
 
