@@ -53,6 +53,8 @@ func MakeExecutable(executable string) error {
 }
 
 func MakeAllExecutable(directory string) error {
+	zap.L().Info("Scanning " + directory + " for files to make executable")
+
 	return filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err

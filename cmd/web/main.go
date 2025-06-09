@@ -25,6 +25,7 @@ func main() {
 	zap.L().Info("OPA policy path: " + fmt.Sprint(environment.GetOpaPolicyPath()))
 	zap.L().Info("Tofu executable: " + fmt.Sprint(environment.GetTofuExecutable()))
 	zap.L().Info("Disable setting binary execution flag: " + fmt.Sprint(environment.DisableMakeBinariesExecutable()))
+	zap.L().Info("Disable Terraform config: " + fmt.Sprint(environment.GetDisableTerraformCliConfig()))
 	zap.L().Info("Enhanced logging instance: " + fmt.Sprint(environment.GetEnhancedLoggingInstances()))
 	zap.L().Info("Port: " + fmt.Sprint(environment.GetPort()))
 
@@ -33,9 +34,11 @@ func main() {
 		return
 	}
 
-	if err := validation.TestFileSystemProviderInstallation(cwd); err != nil {
-		zap.L().Error(err.Error())
-		return
+	if !environment.GetDisableTerraformCliConfig() {
+		if err := validation.TestFileSystemProviderInstallation(cwd); err != nil {
+			zap.L().Error(err.Error())
+			return
+		}
 	}
 
 	if err := application.StartServer(); err != nil {
