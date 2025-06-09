@@ -39,7 +39,7 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 			return
 		}
 
-		routerClient, err := router.GetHttpClient(server)
+		routerClient, host, err := router.GetHttpClient(apiURL)
 
 		if err != nil {
 			zap.L().Error("Failed to create HTTP client", zap.Error(err))
@@ -55,7 +55,7 @@ func JwtCheckMiddleware(skipValidation bool) gin.HandlerFunc {
 		// Since we store the audience in the feedback items, we can filter out bad requests later.
 		// It also raises the bar for anyone looking to abuse the API, as you would need to generate valid JWTs,
 		// host a JWKS server, and host a server that responds the API request.
-		octopusClient, err := client.NewClientWithAccessToken(routerClient, apiURL, token, "")
+		octopusClient, err := client.NewClientWithAccessToken(routerClient, host, token, "")
 		if err != nil {
 			zap.L().Error("Failed to open Octopus client", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
