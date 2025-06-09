@@ -1,17 +1,25 @@
 package terraform
 
 import (
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"strings"
 	"testing"
 )
 
 func TestGenerateTerraformRC(t *testing.T) {
 	// Get current working directory to use in verification
-	currentDir, err := os.Getwd()
-	require.NoError(t, err, "Failed to get current working directory")
+	installDir, err := environment.GetInstallationDirectory()
+
+	if err != nil {
+		t.Fatal("Failed to get installation directory:", err)
+	}
+
+	providerPath := environment.GetTerraformProvidersPath()
+
+	localPath := files.GetAbsoluteOrRelativePath(providerPath, installDir)
 
 	// Call the function under test
 	content, err := GenerateTerraformRC()
@@ -22,7 +30,7 @@ func TestGenerateTerraformRC(t *testing.T) {
 	// Verify the content
 	assert.Contains(t, content, "provider_installation {", "Should contain provider_installation section")
 	assert.Contains(t, content, "filesystem_mirror {", "Should contain filesystem_mirror section")
-	assert.Contains(t, content, "path    = \""+currentDir+"/provider\"", "Should contain correct provider path")
+	assert.Contains(t, content, "path    = \""+localPath+"\"", "Should contain correct provider path")
 	assert.Contains(t, content, "include = [\"*/*/*\"]", "Should include all providers")
 	assert.Contains(t, content, "direct {exclude = [\"*/*/*\"]}", "Should contain direct provider section")
 
