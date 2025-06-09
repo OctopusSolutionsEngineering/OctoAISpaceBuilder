@@ -145,12 +145,16 @@ func generatePlan(tempDir string, token string, apiKey string, aud string, space
 			planFile,
 			"-var=octopus_space_id=" + spaceId},
 		map[string]string{
-			"OCTOPUS_ACCESS_TOKEN":  token,
-			"OCTOPUS_API_KEY":       apiKey,
-			"OCTOPUS_URL":           aud,
-			"TF_INPUT":              "0",
-			"TF_VAR_octopus_apikey": "",
-			"TF_VAR_octopus_server": "",
+			"OCTOPUS_ACCESS_TOKEN":        token,
+			"OCTOPUS_API_KEY":             apiKey,
+			"OCTOPUS_URL":                 aud,
+			"TF_INPUT":                    "0",
+			"TF_VAR_octopus_apikey":       "",
+			"TF_VAR_octopus_server":       "",
+			"REDIRECTION_SERVICE_API_KEY": os.Getenv("REDIRECTION_SERVICE_API_KEY"),
+			"REDIRECTION_HOST":            os.Getenv("REDIRECTION_HOST"),
+			"REDIRECTION_SERVICE_ENABLED": os.Getenv("REDIRECTION_SERVICE_ENABLED"),
+			"TF_REATTACH_PROVIDERS":       os.Getenv("TF_REATTACH_PROVIDERS"),
 		})
 
 	logging.LogEnhanced(stdErr, aud)
