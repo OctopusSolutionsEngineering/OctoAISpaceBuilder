@@ -47,18 +47,19 @@ func main() {
 	/*
 		Validate that the required files are present. This is important because missing files lead to strange behaviour.
 		For example, missing policy files leads to OPA hanging indefinitely.
-		The location of the files depends on whether the application is running in Azure Functions or not.
+		This helps people running the service locally to ensure they have the correct files in place.
 	*/
-
-	if err := validation.TestOpaPolicyInstallation(installDir); err != nil {
-		zap.L().Error(err.Error())
-		return
-	}
-
-	if !environment.GetDisableTerraformCliConfig() {
-		if err := validation.TestFileSystemProviderInstallation(installDir); err != nil {
+	if !environment.IsInAzureFunctions() {
+		if err := validation.TestOpaPolicyInstallation(installDir); err != nil {
 			zap.L().Error(err.Error())
 			return
+		}
+
+		if !environment.GetDisableTerraformCliConfig() {
+			if err := validation.TestFileSystemProviderInstallation(installDir); err != nil {
+				zap.L().Error(err.Error())
+				return
+			}
 		}
 	}
 
