@@ -25,11 +25,19 @@ func main() {
 		return
 	}
 
+	installDir, err := environment.GetInstallationDirectory()
+	if err != nil {
+		zap.L().Error(err.Error())
+		return
+	}
+
 	zap.L().Info("Current working directory: " + cwd)
 	zap.L().Info("Home directory: " + homeDir)
+	zap.L().Info("Install directory: " + installDir)
 	zap.L().Info("Disable validation: " + fmt.Sprint(environment.DisableValidation()))
 	zap.L().Info("OPA executable: " + fmt.Sprint(environment.GetOpaExecutable()))
 	zap.L().Info("OPA policy path: " + fmt.Sprint(environment.GetOpaPolicyPath()))
+	zap.L().Info("Tofu providers path: " + fmt.Sprint(environment.GetTerraformProvidersPath()))
 	zap.L().Info("Tofu executable: " + fmt.Sprint(environment.GetTofuExecutable()))
 	zap.L().Info("Disable setting binary execution flag: " + fmt.Sprint(environment.DisableMakeBinariesExecutable()))
 	zap.L().Info("Disable Terraform config: " + fmt.Sprint(environment.GetDisableTerraformCliConfig()))
@@ -41,12 +49,6 @@ func main() {
 		For example, missing policy files leads to OPA hanging indefinitely.
 		The location of the files depends on whether the application is running in Azure Functions or not.
 	*/
-	installDir, err := environment.GetInstallationDirectory()
-
-	if err != nil {
-		zap.L().Error(err.Error())
-		return
-	}
 
 	if err := validation.TestOpaPolicyInstallation(installDir); err != nil {
 		zap.L().Error(err.Error())

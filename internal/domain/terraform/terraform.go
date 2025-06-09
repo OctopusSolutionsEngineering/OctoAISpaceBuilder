@@ -3,6 +3,7 @@ package terraform
 import (
 	"fmt"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"os"
 	"path/filepath"
 	"time"
@@ -99,9 +100,13 @@ func GenerateTerraformRC() (string, error) {
 		return "", err
 	}
 
+	providerPath := environment.GetTerraformProvidersPath()
+
+	localPath := files.GetAbsoluteOrRelativePath(providerPath, installDir)
+
 	return `provider_installation {
   filesystem_mirror {
-    path    = "` + installDir + `/provider"
+    path    = "` + localPath + `"
     include = ["*/*/*"]
   }
   direct {exclude = ["*/*/*"]}

@@ -14,3 +14,11 @@ func GetDisableTerraformCliConfig() bool {
 	// Default to false if the environment variable is not set or not "true"
 	return false
 }
+
+func GetTerraformProvidersPath() string {
+	if os.Getenv("SPACEBUILDER_TERRAFORM_PROVIDERS") != "" {
+		return os.Getenv("SPACEBUILDER_TERRAFORM_PROVIDERS")
+	}
+
+	return "provider"
+}

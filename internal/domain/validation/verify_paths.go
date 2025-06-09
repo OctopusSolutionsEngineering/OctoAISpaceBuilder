@@ -2,6 +2,8 @@ package validation
 
 import (
 	"errors"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/terraform"
 	"os"
 	"path/filepath"
@@ -9,9 +11,10 @@ import (
 
 // TestFileSystemProviderInstallation is a sanity check to ensure the filesystem provider installation is correct.
 func TestFileSystemProviderInstallation(baseDir string) error {
+	localPath := files.GetAbsoluteOrRelativePath(environment.GetTerraformProvidersPath(), baseDir)
+
 	octopusProvidersDir := filepath.Join(
-		baseDir,
-		"provider",
+		localPath,
 		"registry.opentofu.org",
 		"octopusdeploy",
 		"octopusdeploy",
@@ -27,7 +30,9 @@ func TestFileSystemProviderInstallation(baseDir string) error {
 }
 
 func TestOpaPolicyInstallation(baseDir string) error {
-	opaPolicyPath := filepath.Join(baseDir, "policy", "terraform.rego")
+	localPath := files.GetAbsoluteOrRelativePath(environment.GetOpaPolicyPath(), baseDir)
+
+	opaPolicyPath := filepath.Join(localPath, "terraform.rego")
 
 	if _, err := os.Stat(opaPolicyPath); os.IsNotExist(err) {
 		return errors.New("OPA policy file " + opaPolicyPath + " does not exist")
