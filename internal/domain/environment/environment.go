@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"go.uber.org/zap"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -29,17 +30,13 @@ func GetInstallationDirectory() (string, error) {
 		return "", err
 	}
 
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
 	if IsInAzureFunctions() {
-		// In Azure Functions, use the home directory
-		return homeDir, nil
+		// In Azure Functions, everything in in the current working directory
+		return cwd, nil
 	}
 
-	return cwd, nil
+	// When running locally, the policies and other files are in the "functions" directory
+	return filepath.Join(cwd, "functions"), nil
 }
 
 func DisableValidation() bool {
