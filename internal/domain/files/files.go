@@ -1,6 +1,9 @@
 package files
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+)
 import cp "github.com/otiai10/copy"
 
 func CreateTempDir() (string, error) {
@@ -26,4 +29,18 @@ func CopyDir(source string) (string, error) {
 	err = cp.Copy(source, dest)
 
 	return dest, err
+}
+
+func GetAbsoluteOrRelativePath(relativeOrAbsolute string, basePath string) string {
+	if relativeOrAbsolute == "" {
+		return basePath
+	}
+
+	// Check if the path is already absolute
+	if filepath.IsAbs(relativeOrAbsolute) {
+		return relativeOrAbsolute
+	}
+
+	// If not, make it relative to the current working directory
+	return filepath.Join(basePath, relativeOrAbsolute)
 }

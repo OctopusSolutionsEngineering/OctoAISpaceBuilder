@@ -19,7 +19,14 @@ func main() {
 		return
 	}
 
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		zap.L().Error(err.Error())
+		return
+	}
+
 	zap.L().Info("Current working directory: " + cwd)
+	zap.L().Info("Home directory: " + homeDir)
 	zap.L().Info("Disable validation: " + fmt.Sprint(environment.DisableValidation()))
 	zap.L().Info("OPA executable: " + fmt.Sprint(environment.GetOpaExecutable()))
 	zap.L().Info("OPA policy path: " + fmt.Sprint(environment.GetOpaPolicyPath()))
@@ -29,13 +36,25 @@ func main() {
 	zap.L().Info("Enhanced logging instance: " + fmt.Sprint(environment.GetEnhancedLoggingInstances()))
 	zap.L().Info("Port: " + fmt.Sprint(environment.GetPort()))
 
-	if err := validation.TestOpaPolicyInstallation(cwd); err != nil {
+	/*
+		Validate that the required files are present. This is important because missing files lead to strange behaviour.
+		For example, missing policy files leads to OPA hanging indefinitely.
+		The location of the files depends on whether the application is running in Azure Functions or not.
+	*/
+	installDir, err := environment.GetInstallationDirectory()
+
+	if err != nil {
+		zap.L().Error(err.Error())
+		return
+	}
+
+	if err := validation.TestOpaPolicyInstallation(installDir); err != nil {
 		zap.L().Error(err.Error())
 		return
 	}
 
 	if !environment.GetDisableTerraformCliConfig() {
-		if err := validation.TestFileSystemProviderInstallation(cwd); err != nil {
+		if err := validation.TestFileSystemProviderInstallation(installDir); err != nil {
 			zap.L().Error(err.Error())
 			return
 		}

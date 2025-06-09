@@ -19,6 +19,29 @@ func GetPort() string {
 	return port
 }
 
+func IsInAzureFunctions() bool {
+	return os.Getenv("FUNCTIONS_WORKER_RUNTIME") == "custom"
+}
+
+func GetInstallationDirectory() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	if IsInAzureFunctions() {
+		// In Azure Functions, use the home directory
+		return homeDir, nil
+	}
+
+	return cwd, nil
+}
+
 func DisableValidation() bool {
 	// Get the disable validation flag from the environment variable
 	disableValidation := os.Getenv("DISABLE_VALIDATION")

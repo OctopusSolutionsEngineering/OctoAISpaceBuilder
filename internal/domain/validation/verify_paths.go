@@ -8,9 +8,9 @@ import (
 )
 
 // TestFileSystemProviderInstallation is a sanity check to ensure the filesystem provider installation is correct.
-func TestFileSystemProviderInstallation(currentDir string) error {
+func TestFileSystemProviderInstallation(baseDir string) error {
 	octopusProvidersDir := filepath.Join(
-		currentDir,
+		baseDir,
 		"provider",
 		"registry.opentofu.org",
 		"octopusdeploy",
@@ -26,8 +26,8 @@ func TestFileSystemProviderInstallation(currentDir string) error {
 	return nil
 }
 
-func TestOpaPolicyInstallation(currentDir string) error {
-	opaPolicyPath := filepath.Join(currentDir, "policy", "terraform.rego")
+func TestOpaPolicyInstallation(baseDir string) error {
+	opaPolicyPath := filepath.Join(baseDir, "policy", "terraform.rego")
 
 	if _, err := os.Stat(opaPolicyPath); os.IsNotExist(err) {
 		return errors.New("OPA policy file " + opaPolicyPath + " does not exist")
