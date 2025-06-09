@@ -39,7 +39,7 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 
 	policyPath := filepath.Join(cwd, "../../functions/policy/")
 	if err := os.Setenv("SPACEBUILDER_OPA_POLICY_PATH", policyPath); err != nil {
-		t.Fatalf("Failed to set SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG: %v", err)
+		t.Fatalf("Failed to set SPACEBUILDER_OPA_POLICY_PATH: %v", err)
 	}
 
 	base, err := files.CopyDir("../../terraform")

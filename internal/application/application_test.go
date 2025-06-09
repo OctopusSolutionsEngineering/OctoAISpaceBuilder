@@ -12,12 +12,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
 // TestTerraformPlanAndApplyEndpoint plans and then applies a terraform configuration via the application
 // level Gin interface.
 func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get cwd: %v", err)
+	}
+
 	if err := os.Setenv("AzureWebJobsStorage", "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"); err != nil {
 		t.Fatalf("Failed to set AzureWebJobsStorage: %v", err)
 	}
@@ -38,8 +44,9 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 	}
 
 	// Set the OPA policy path to the local policy directory
-	if err := os.Setenv("SPACEBUILDER_OPA_POLICY_PATH", "../../functions/policy/"); err != nil {
-		t.Fatalf("Failed to set SPACEBUILDER_DISABLE_TERRAFORM_CLI_CONFIG: %v", err)
+	policyPath := filepath.Join(cwd, "../../functions/policy/")
+	if err := os.Setenv("SPACEBUILDER_OPA_POLICY_PATH", policyPath); err != nil {
+		t.Fatalf("Failed to set SPACEBUILDER_OPA_POLICY_PATH: %v", err)
 	}
 
 	base, err := files.CopyDir("../../terraform")
