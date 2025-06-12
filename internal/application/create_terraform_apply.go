@@ -38,9 +38,22 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	response, err := handler.CreateTerraformApply(server, token, apiKey, terraform)
+	var response *model.TerraformApply = nil
+	var applyError error = nil
 
-	if err != nil {
+	// There are cases where the terraform apply might fail by the resources are created.
+	// Errors like "unable to locate variable for owner ID Projects-2" are an example where
+	// applying the plan a second time succeeds.
+	// This is most likely due to a bug in the Terraform provider.
+	// But, there is no harm in retrying the apply operation a second time.
+	for i := 0; i < 2; i++ {
+		response, applyError = handler.CreateTerraformApply(server, token, apiKey, terraform)
+		if applyError == nil {
+			break
+		}
+	}
+
+	if applyError != nil {
 		zap.L().Error("Failed to perform Terraform apply", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
