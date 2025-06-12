@@ -54,8 +54,8 @@ func CreateTerraformApply(c *gin.Context) {
 	}
 
 	if applyError != nil {
-		zap.L().Error("Failed to perform Terraform apply", zap.Error(err))
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		zap.L().Error("Failed to perform Terraform apply", zap.Error(applyError))
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", applyError))
 		return
 	}
 
