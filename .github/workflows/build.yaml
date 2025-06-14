@@ -163,7 +163,7 @@ jobs:
           OCTOPUS_SPACE: "Octopus Copilot"
         with:
           project: Octopus SpaceBuilder Function
-          packages: octoterra_azure:${{ steps.determine_version.outputs.semVer }}
+          packages: octoterra_azure:${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }}
           release_number: ${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }}
           git_ref: main
       - name: Archive code coverage results
