@@ -132,7 +132,7 @@ jobs:
       # Microsoft.Azure.WebJobs.Script: WorkerConfig for runtime: custom not found.
       - run: |
           zip -r spacebuilder_linux_amd64_azure.zip . -x local.settings.json
-          cp spacebuilder_linux_amd64_azure.zip spacebuilder_azure.${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }.zip
+          cp spacebuilder_linux_amd64_azure.zip spacebuilder_azure.${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }}.zip
         working-directory: functions
       - name: Tag Release
         uses: mathieudutour/github-tag-action@v6.1
