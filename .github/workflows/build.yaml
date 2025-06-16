@@ -144,7 +144,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         continue-on-error: true
         with:
-          tag_name: ${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }
+          tag_name: ${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }}
           files: functions/spacebuilder_linux_amd64_azure.zip
       - name: Push packages to Octopus Deploy
         if: ${{ steps.branch-name.outputs.current_branch == 'main' }}
