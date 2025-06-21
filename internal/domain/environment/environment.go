@@ -25,6 +25,11 @@ func IsInAzureFunctions() bool {
 }
 
 func GetInstallationDirectory() (string, error) {
+	if os.Getenv("SPACEBUILDER_INSTALLATION_DIRECTORY") != "" {
+		// If the environment variable is set, use it as the installation directory
+		return os.Getenv("SPACEBUILDER_INSTALLATION_DIRECTORY"), nil
+	}
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err
