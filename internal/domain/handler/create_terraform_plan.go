@@ -192,7 +192,8 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 			"-no-color",
 			planFile},
 		map[string]string{
-			"TF_INPUT": "0",
+			"TF_INPUT":              "0",
+			"TF_REATTACH_PROVIDERS": os.Getenv("TF_REATTACH_PROVIDERS"),
 		})
 
 	if err != nil {
@@ -213,7 +214,8 @@ func generatePlanText(tempDir string, planFile string) (string, error) {
 			"-no-color",
 			planFile},
 		map[string]string{
-			"TF_INPUT": "0",
+			"TF_INPUT":              "0",
+			"TF_REATTACH_PROVIDERS": os.Getenv("TF_REATTACH_PROVIDERS"),
 		})
 
 	if err != nil {

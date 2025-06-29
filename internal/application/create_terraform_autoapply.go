@@ -42,7 +42,6 @@ func CreateTerraformAutoApply(c *gin.Context) {
 
 	terraformApply := model.TerraformApply{
 		PlanId: response.ID,
-		Server: server,
 	}
 
 	applyResponse, err := handler.CreateTerraformApply(server, token, apiKey, terraformApply)
