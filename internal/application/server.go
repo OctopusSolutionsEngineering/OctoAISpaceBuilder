@@ -11,6 +11,7 @@ func StartServer() error {
 	router := gin.Default()
 	router.POST("/api/terraformplan", middleware.AuthCheck, middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformPlan)
 	router.POST("/api/terraformapply", middleware.AuthCheck, middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformApply)
+	router.POST("/api/terraformautoapply", middleware.AuthCheck, middleware.JwtCheckMiddleware(environment.DisableValidation()), middleware.MakeExecutable, CreateTerraformAutoApply)
 	router.GET("/api/health", Health)
 	router.GET("/", Health)
 	router.Any("/cleanup", CleanupOldPlans)
