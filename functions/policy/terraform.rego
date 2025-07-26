@@ -14,7 +14,7 @@ affects_non_octopusdeploy_resources[msg] if {
     msg := sprintf("Attempted to create type of ': %v", [resource_change.type])
 }
 
-# Make sure all sensitive values defulat to "Change Me!"
+# Make sure all sensitive values default to "Change Me!"
 custom_sensitive_vars[msg] if {
     # Get resources from planned_values
     resource := input.planned_values.root_module.resources[_]
@@ -37,6 +37,7 @@ custom_sensitive_vars[msg] if {
     actual_value != "Change Me!"
     actual_value != "CHANGE_ME"
     actual_value != "CHANGE ME"
+    actual_value != "CHANGEME"
     actual_value != "AWS_SECRET_KEY"
 
     # Feed usernames have been flagged as sensitive, so we include a couple of exceptions here
