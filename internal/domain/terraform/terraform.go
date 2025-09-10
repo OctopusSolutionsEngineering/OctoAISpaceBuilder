@@ -2,14 +2,15 @@ package terraform
 
 import (
 	"fmt"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
-	"go.uber.org/zap"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
+	"go.uber.org/zap"
 )
 
-const TerraformProviderVersion = "1.0.1"
+const TerraformProviderVersion = "1.3.8"
 
 func WriteOverrides(path string) error {
 	if err := WriteBackendOverride(path); err != nil {
