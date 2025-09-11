@@ -2,10 +2,11 @@ package environment
 
 import (
 	"encoding/json"
-	"go.uber.org/zap"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 func GetPort() string {
@@ -18,6 +19,22 @@ func GetPort() string {
 		}
 	}
 	return port
+}
+
+func GetRedirectionBypass() []string {
+	hostnames := []string{}
+	hostnamesJson := os.Getenv("REDIRECTION_BYPASS")
+	if hostnamesJson == "" {
+		return []string{} // Default to empty slice if not set
+	}
+
+	err := json.Unmarshal([]byte(hostnamesJson), &hostnames)
+	if err != nil {
+		zap.L().Error("Error parsing JSON:", zap.Error(err))
+		return []string{}
+	}
+
+	return hostnames
 }
 
 func IsInAzureFunctions() bool {
