@@ -37,6 +37,11 @@ func GetRedirectionBypass() []string {
 	return hostnames
 }
 
+func GetRedirectionForce() bool {
+	redirectionForce := os.Getenv("REDIRECTION_FORCE")
+	return strings.ToLower(redirectionForce) == "true"
+}
+
 func IsInAzureFunctions() bool {
 	return os.Getenv("FUNCTIONS_WORKER_RUNTIME") == "custom"
 }

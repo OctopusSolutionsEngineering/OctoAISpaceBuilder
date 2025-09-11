@@ -50,6 +50,11 @@ func isDirectlyAccessibleOctopusInstance(octopusUrl *url.URL) bool {
 		return true
 	}
 
+	// Allow forcing all traffic through the redirection service
+	if environment.GetRedirectionForce() {
+		return false
+	}
+
 	return strings.HasSuffix(octopusUrl.Hostname(), ".octopus.app") ||
 		strings.HasSuffix(octopusUrl.Hostname(), ".testoctopus.com") ||
 		octopusUrl.Hostname() == "localhost" ||
