@@ -2,11 +2,13 @@ package router
 
 import (
 	"errors"
-	"go.uber.org/zap"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/samber/lo"
+	"go.uber.org/zap"
 )
 
 type HeaderRoundTripper struct {
@@ -38,6 +40,14 @@ func isDirectlyAccessibleOctopusInstance(octopusUrl *url.URL) bool {
 
 	if !found || serviceEnabled != "true" {
 		return true
+	}
+
+	// Allow bypassing specific domains via environment variable
+	if bypass, found := os.LookupEnv("REDIRECTION_BYPASS"); found {
+		bypassList := strings.Split(bypass, ",")
+		if lo.Contains(bypassList, octopusUrl.Hostname()) {
+			return true
+		}
 	}
 
 	return strings.HasSuffix(octopusUrl.Hostname(), ".octopus.app") ||
