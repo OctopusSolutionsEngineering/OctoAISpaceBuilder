@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 )
@@ -42,12 +43,11 @@ func isDirectlyAccessibleOctopusInstance(octopusUrl *url.URL) bool {
 		return true
 	}
 
+	bypassList := environment.GetRedirectionBypass()
+
 	// Allow bypassing specific domains via environment variable
-	if bypass, found := os.LookupEnv("REDIRECTION_BYPASS"); found {
-		bypassList := strings.Split(bypass, ",")
-		if lo.Contains(bypassList, octopusUrl.Hostname()) {
-			return true
-		}
+	if lo.Contains(bypassList, octopusUrl.Hostname()) {
+		return true
 	}
 
 	return strings.HasSuffix(octopusUrl.Hostname(), ".octopus.app") ||
