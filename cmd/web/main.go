@@ -42,6 +42,8 @@ func main() {
 	zap.L().Info("Disable setting binary execution flag: " + fmt.Sprint(environment.DisableMakeBinariesExecutable()))
 	zap.L().Info("Disable Terraform config: " + fmt.Sprint(environment.GetDisableTerraformCliConfig()))
 	zap.L().Info("Enhanced logging instance: " + fmt.Sprint(environment.GetEnhancedLoggingInstances()))
+	zap.L().Info("Force the redirector: " + fmt.Sprint(environment.GetRedirectionForce()))
+	zap.L().Info("Redirector bypass: " + fmt.Sprint(environment.GetRedirectionBypass()))
 	zap.L().Info("Port: " + fmt.Sprint(environment.GetPort()))
 
 	/*
