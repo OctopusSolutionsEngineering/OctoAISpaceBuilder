@@ -122,8 +122,9 @@ jobs:
           CGO_ENABLED: 0
       - name: Download binaries
         run: |
-          curl -L -o tofu.tar.gz https://github.com/opentofu/opentofu/releases/download/v1.9.0/tofu_1.9.0_linux_amd64.tar.gz
-          tar -xzf tofu.tar.gz -C functions/binaries
+          curl -L -o tofu https://github.com/OctopusSolutionsEngineering/opentofu/releases/download/v1.10.6/tofu
+          cp tofu functions/binaries
+          chmod +x functions/binaries/tofu
           curl -L -o functions/binaries/opa_linux_amd64 https://github.com/open-policy-agent/opa/releases/download/v1.3.0/opa_linux_amd64
           chmod +x functions/binaries/opa_linux_amd64
           mkdir -p functions/provider/registry.opentofu.org/octopusdeploy/octopusdeploy/1.3.8/linux_amd64
