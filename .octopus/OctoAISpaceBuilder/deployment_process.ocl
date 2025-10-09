@@ -1,7 +1,7 @@
 process_template "deployment" {
     name = "Deployment"
     process_template_slug = "azure-function-deployment-go"
-    version_mask = "1.X"
+    version_mask = "2.X"
 
     package_parameter "Packages.FunctionApp" {
         feed = "octopus-server-built-in"
@@ -23,6 +23,10 @@ process_template "deployment" {
 
     parameter "Octopus.ContainerImageFeed" {
         value = "Feeds-4704"
+    }
+
+    parameter "Octopus.Environment.Security" {
+        value = "Environments-3023"
     }
 }
 
