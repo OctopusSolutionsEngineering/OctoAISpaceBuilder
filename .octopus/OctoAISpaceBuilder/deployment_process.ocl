@@ -1,76 +1,83 @@
-step "deploy-with-cli" {
-    name = "Deploy with CLI"
+process_template "predeploy-hook" {
+    name = "PreDeploy Hook"
+    process_template_slug = "project-predeploy-hook"
+    version_mask = "1.X"
 
-    action {
-        environments = ["production"]
-        properties = {
-            Octopus.Action.Template.Id = "ActionTemplates-4321"
-            Octopus.Action.Template.Version = "7"
-            Packages.FunctionApp = "{\"PackageId\":\"spacebuilder_azure\",\"FeedId\":\"octopus-server-built-in\"}"
-        }
-        worker_pool = "hosted-ubuntu"
-
-        container {
-            feed = "docker-hub"
-            image = "octopuslabs/azure-workertools"
-        }
-
-        packages "Packages.FunctionApp" {
-            acquisition_location = "Server"
-            feed = "octopus-server-built-in"
-            package_id = "spacebuilder_azure"
-            properties = {
-                Extract = "True"
-                PackageParameterName = "Packages.FunctionApp"
-                Purpose = ""
-                SelectionMode = "deferred"
-            }
-        }
+    parameter "Octopus.WorkerPool" {
+        value = "WorkerPools-2688"
     }
 }
 
-step "remove-worker-access" {
-    name = "Remove worker access"
+process_template "deployment" {
+    name = "Deployment"
+    process_template_slug = "azure-function-deployment-go"
+    version_mask = "2.X"
 
-    action {
-        environments = ["production"]
-        properties = {
-            Octopus.Action.Template.Id = "ActionTemplates-4322"
-            Octopus.Action.Template.Version = "0"
-        }
-        worker_pool = "hosted-ubuntu"
+    package_parameter "Packages.FunctionApp" {
+        feed = "octopus-server-built-in"
+        package_id = "spacebuilder_azure"
+    }
 
-        container {
-            feed = "docker-hub"
-            image = "octopuslabs/azure-workertools"
-        }
+    package_parameter "Packages.FunctionsCli" {
+        feed = "octopus-server-built-in"
+        package_id = "Azure.Functions.Cli.linux-x64"
+    }
+
+    parameter "Azure.Account" {
+        value = "Octopus.Azure.Account"
+    }
+
+    parameter "Octopus.WorkerPool" {
+        value = "WorkerPools-2688"
+    }
+
+    parameter "Octopus.ContainerImageFeed" {
+        value = "Feeds-4704"
+    }
+
+    parameter "Octopus.Environment.Security" {
+        value = "Environments-3023"
     }
 }
 
-step "scan-for-security-vulnerabilities" {
-    name = "Scan for Security Vulnerabilities"
+process_template "security" {
+    name = "Security"
+    process_template_slug = "azure-function-deployment"
+    version_mask = "4.X"
 
-    action {
-        environments = ["security"]
-        properties = {
-            Octopus.Action.AutoRetry.MaximumCount = "3"
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-4361"
-            Octopus.Action.Template.Version = "3"
-            SecurityScan.Package = "{\"PackageId\":\"spacebuilder_azure\",\"FeedId\":\"octopus-server-built-in\"}"
-        }
-        worker_pool_variable = ""
+    package_parameter "Packages.AzureCli" {
+        feed = "octopus-server-built-in"
+        package_id = "Azure.Functions.Cli.linux-x64"
+    }
 
-        packages "ApplicationPackage" {
-            acquisition_location = "Server"
-            feed = "octopus-server-built-in"
-            package_id = "spacebuilder_azure"
-            properties = {
-                Extract = "True"
-                PackageParameterName = "SecurityScan.Package"
-                Purpose = ""
-                SelectionMode = "deferred"
-            }
-        }
+    package_parameter "SecurityScan.Package" {
+        feed = "octopus-server-built-in"
+        package_id = "spacebuilder_azure"
+    }
+
+    parameter "Azure.Account" {
+        value = "Octopus.Azure.Account"
+    }
+
+    parameter "Octopus.WorkerPool" {
+        value = "WorkerPools-2688"
+    }
+
+    parameter "Octopus.ContainerImageFeed" {
+        value = "Feeds-4704"
+    }
+
+    parameter "Octopus.SecurityEnvironment" {
+        value = "Environments-3023"
+    }
+}
+
+process_template "postdeploy-hook" {
+    name = "PostDeploy Hook"
+    process_template_slug = "project-postdeploy-hook"
+    version_mask = "1.X"
+
+    parameter "Octopus.WorkerPool" {
+        value = "WorkerPools-2688"
     }
 }
