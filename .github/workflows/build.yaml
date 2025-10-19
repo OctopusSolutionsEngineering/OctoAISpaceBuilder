@@ -109,6 +109,19 @@ jobs:
           GOMAXPROCS: 2
           LICENSE: ${{ secrets.LICENSE }}
           AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
+
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}:${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }} .
+        shell: bash
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        shell: bash
+
+      - name: Push Docker image to GHCR
+        run: docker push ghcr.io/${{ github.repository }}:${{ steps.determine_version.outputs.semVer }}+${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }}
+        shell: bash
+
       - name: Build patched version of TF provider
         run: |
           git clone https://github.com/OctopusDeploy/terraform-provider-octopusdeploy.git
