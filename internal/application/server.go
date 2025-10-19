@@ -16,5 +16,5 @@ func StartServer() error {
 	router.GET("/", Health)
 	router.Any("/cleanup", CleanupOldPlans)
 
-	return router.Run("localhost:" + environment.GetPort())
+	return router.Run("0.0.0.0:" + environment.GetPort())
 }
