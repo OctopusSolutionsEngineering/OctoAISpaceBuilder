@@ -13,6 +13,15 @@ This services forces the use of a local backend, which is not persisted between 
 * The client can only send Terraform configuration. The service defines all the file names (i.e. the service controls overrides).
 * The client can not send variable values as separate files.
 * Old plan records are deleted after 5 minutes.
+* We use a custom build of OpenTofu which has a limited number of function.
+
+## OpenTofu fork
+
+The forked version of OpenTofu is available [here](https://github.com/OctopusSolutionsEngineering/opentofu).
+
+Create a release of the fork with the workflow [here](https://github.com/OctopusSolutionsEngineering/opentofu/actions/workflows/manual_release.yaml). This builds the OpenTofu binary and saves it as a GitHub release.
+
+The new version of OpenTofu is them referenced in the workflow [here](.github/workflows/buil.yaml).
 
 ## Terraform Provider
 
