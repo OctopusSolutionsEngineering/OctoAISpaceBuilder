@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const TerraformProviderVersion = "1.3.10"
+const TerraformProviderVersion = "1.3.12"
 
 func WriteOverrides(path string) error {
 	if err := WriteBackendOverride(path); err != nil {
