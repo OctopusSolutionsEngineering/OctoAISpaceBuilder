@@ -10,6 +10,12 @@ import (
 	"go.uber.org/zap"
 )
 
+/*
+		This version must be updated:
+		* In the build.yaml file
+	 	* In the Dockerfile
+	 	* In the functions/provider/registry.opentofu.org/octopusdeploy/octopusdeploy directory
+*/
 const TerraformProviderVersion = "1.3.12"
 
 func WriteOverrides(path string) error {
