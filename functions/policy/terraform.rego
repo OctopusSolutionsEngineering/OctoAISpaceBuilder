@@ -44,6 +44,7 @@ custom_sensitive_vars[msg] if {
     actual_value != "x-access-token"
     actual_value != "username"
     actual_value != "mcasperson"
+    actual_value != "solutionsbot"
 
     # Variable references are ok
     not regex.match(`^#\{[^}]+\}$`, actual_value)
