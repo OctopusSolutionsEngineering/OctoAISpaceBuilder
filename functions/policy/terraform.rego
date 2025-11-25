@@ -50,6 +50,12 @@ custom_sensitive_vars[msg] if {
     # Variable references are ok
     not regex.match(`^#\{[^}]+\}$`, actual_value)
 
+    # Resource references are ok. This is because the values of a octopusdeploy_tenant_common_variable
+    # are always sensitive, regardless of type.
+    not regex.match(`^Accounts-\d+$`, actual_value)
+    not regex.match(`^WorkerPools-\d+$`, actual_value)
+    not regex.match(`^Certificates-\d+$`, actual_value)
+
     actual_value != null
 
     # Generate a failure message
