@@ -19,6 +19,10 @@ custom_sensitive_vars[msg] if {
     # Get resources from planned_values
     resource := input.planned_values.root_module.resources[_]
 
+    # The value associated with a tenant project variable is always senstive,
+    # even if it is a regular variable. So we don't try and vaidate these resources.
+    resource.type != "octopusdeploy_tenant_project_variable"
+
     # Check if sensitive_values exists in the resource
     is_object(resource.sensitive_values)
 
@@ -50,8 +54,7 @@ custom_sensitive_vars[msg] if {
     # Variable references are ok
     not regex.match(`^#\{[^}]+\}$`, actual_value)
 
-    # Resource references are ok. This is because the values of a octopusdeploy_tenant_common_variable
-    # are always sensitive, regardless of type.
+    # Resource references are ok.
     not regex.match(`^Accounts-\d+$`, actual_value)
     not regex.match(`^WorkerPools-\d+$`, actual_value)
     not regex.match(`^Certificates-\d+$`, actual_value)
