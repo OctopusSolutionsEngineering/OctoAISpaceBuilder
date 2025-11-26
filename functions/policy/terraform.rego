@@ -19,9 +19,10 @@ custom_sensitive_vars[msg] if {
     # Get resources from planned_values
     resource := input.planned_values.root_module.resources[_]
 
-    # The value associated with a tenant project variable is always senstive,
+    # The value associated with a tenant variables are always senstive,
     # even if it is a regular variable. So we don't try and vaidate these resources.
     resource.type != "octopusdeploy_tenant_project_variable"
+    resource.type != "octopusdeploy_tenant_common_variable"
 
     # Check if sensitive_values exists in the resource
     is_object(resource.sensitive_values)
