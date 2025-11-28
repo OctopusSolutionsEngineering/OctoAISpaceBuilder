@@ -55,6 +55,10 @@ custom_sensitive_vars[msg] if {
     # Variable references are ok
     not regex.match(`^#\{[^}]+\}$`, actual_value)
 
+    # This is a generic GUID placeholder
+    actual_value != "00000000-0000-0000-0000-000000000000"
+    actual_value != "0000000000000000000000000000000000000000"
+
     # Resource references are ok.
     not regex.match(`^Accounts-\d+$`, actual_value)
     not regex.match(`^WorkerPools-\d+$`, actual_value)
