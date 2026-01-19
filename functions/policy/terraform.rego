@@ -19,10 +19,13 @@ custom_sensitive_vars[msg] if {
     # Get resources from planned_values
     resource := input.planned_values.root_module.resources[_]
 
-    # The value associated with a tenant variables are always senstive,
-    # even if it is a regular variable. So we don't try and vaidate these resources.
+    # The value associated with a tenant variables are always sensitive,
+    # even if it is a regular variable. So we don't try and validate these resources.
     resource.type != "octopusdeploy_tenant_project_variable"
     resource.type != "octopusdeploy_tenant_common_variable"
+
+    # Certificate data is always sensitive, so we don't try and validate these resources.
+    resource.type != "octopusdeploy_certificate"
 
     # Check if sensitive_values exists in the resource
     is_object(resource.sensitive_values)
@@ -34,7 +37,7 @@ custom_sensitive_vars[msg] if {
     # Get the corresponding value from the actual resource values
     is_object(resource.values)
 
-    # Find the corrosponding properties under values
+    # Find the corresponding properties under values
     [actual_path, actual_value] := walk(resource.values)
     actual_path == path
 
