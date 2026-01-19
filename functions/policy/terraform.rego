@@ -41,6 +41,9 @@ custom_sensitive_vars[msg] if {
     [actual_path, actual_value] := walk(resource.values)
     actual_path == path
 
+    # Skip if the property name is "username"
+    actual_path[count(actual_path)-1] != "username"
+
     # Find those properties that are not set to a default value
     actual_value != "Change Me!"
     actual_value != "CHANGE_ME"
