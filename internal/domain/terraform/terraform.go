@@ -16,7 +16,7 @@ import (
 	 	* In the Dockerfile
 	 	* In the functions/provider/registry.opentofu.org/octopusdeploy/octopusdeploy directory
 */
-const TerraformProviderVersion = "1.3.12"
+const TerraformProviderVersion = "1.8.0"
 
 func WriteOverrides(path string) error {
 	if err := WriteBackendOverride(path); err != nil {
