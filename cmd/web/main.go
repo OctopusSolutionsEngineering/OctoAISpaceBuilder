@@ -32,14 +32,17 @@ func main() {
 		return
 	}
 
+	tofu, _ := environment.GetTofuExecutable()
+	opa, _ := environment.GetOpaExecutable()
+
 	zap.L().Info("Current working directory: " + cwd)
 	zap.L().Info("Home directory: " + homeDir)
 	zap.L().Info("Install directory: " + installDir)
 	zap.L().Info("Disable validation: " + fmt.Sprint(environment.DisableValidation()))
-	zap.L().Info("OPA executable: " + fmt.Sprint(environment.GetOpaExecutable()))
+	zap.L().Info("OPA executable: " + fmt.Sprint(opa))
 	zap.L().Info("OPA policy path: " + fmt.Sprint(environment.GetOpaPolicyPath()))
 	zap.L().Info("Tofu providers path: " + fmt.Sprint(environment.GetTerraformProvidersPath()))
-	zap.L().Info("Tofu executable: " + fmt.Sprint(environment.GetTofuExecutable()))
+	zap.L().Info("Tofu executable: " + fmt.Sprint(tofu))
 	zap.L().Info("Disable setting binary execution flag: " + fmt.Sprint(environment.DisableMakeBinariesExecutable()))
 	zap.L().Info("Disable Terraform config: " + fmt.Sprint(environment.GetDisableTerraformCliConfig()))
 	zap.L().Info("Enhanced logging instance: " + fmt.Sprint(environment.GetEnhancedLoggingInstances()))
