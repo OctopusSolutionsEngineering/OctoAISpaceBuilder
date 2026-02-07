@@ -25,9 +25,9 @@ func CopyToWritablePath(c *gin.Context) {
 	}
 
 	// Get the temporary directory
-
 	tempDir := os.TempDir()
 
+	// These directories make up the installation directory
 	dirs := []string{"binaries", "provider", "policy"}
 
 	for _, dir := range dirs {
@@ -53,9 +53,9 @@ func CopyToWritablePath(c *gin.Context) {
 			}
 
 			// Recursively copy the directory
-			if err := copyDir("binaries", destPath); err != nil {
-				zap.L().Error("Failed to copy the binaries directory", zap.Error(err))
-				c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the binaries directory", err))
+			if err := copyDir(dir, destPath); err != nil {
+				zap.L().Error("Failed to copy the "+dir+" directory", zap.Error(err))
+				c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the "+dir+" directory", err))
 				c.Abort()
 				return
 			}
