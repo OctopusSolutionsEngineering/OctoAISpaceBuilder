@@ -34,7 +34,7 @@ func CopyToWritablePath(c *gin.Context) {
 
 		destPath := filepath.Join(tempDir, "dir")
 
-		exists, err := dirExists(destPath)
+		exists, err := pathExists(destPath)
 
 		if err != nil {
 			zap.L().Error("Failed to test the presence of the "+dir+" directory", zap.Error(err))
@@ -44,6 +44,8 @@ func CopyToWritablePath(c *gin.Context) {
 		}
 
 		if !exists {
+			zap.L().Info("Copying the "+dir+" directory", zap.Error(err))
+
 			// Create the directory in temp
 			if err := os.MkdirAll(destPath, 0755); err != nil {
 				zap.L().Error("Failed to create the "+dir+" directory", zap.Error(err))
@@ -65,10 +67,10 @@ func CopyToWritablePath(c *gin.Context) {
 	c.Next()
 }
 
-func dirExists(path string) (bool, error) {
-	info, err := os.Stat(path)
+func pathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
 	if err == nil {
-		return info.IsDir(), nil
+		return true, nil
 	}
 	if errors.Is(err, os.ErrNotExist) {
 		return false, nil
@@ -100,6 +102,13 @@ func copyDir(src, dst string) error {
 }
 
 func copyFile(src, dst string, mode os.FileMode) error {
+	// Skip existing files
+	if exists, err := pathExists(dst); err != nil {
+		return err
+	} else if exists {
+		return nil
+	}
+
 	srcFile, err := os.Open(src)
 	if err != nil {
 		return err
