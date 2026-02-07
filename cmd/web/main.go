@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/validation"
 	"go.uber.org/zap"
-	"os"
 )
 
 func main() {
@@ -51,15 +52,17 @@ func main() {
 		For example, missing policy files leads to OPA hanging indefinitely.
 		This helps people running the service locally to ensure they have the correct files in place.
 	*/
-	if err := validation.TestOpaPolicyInstallation(); err != nil {
-		zap.L().Error(err.Error())
-		return
-	}
-
-	if !environment.GetDisableTerraformCliConfig() {
-		if err := validation.TestFileSystemProviderInstallation(); err != nil {
+	if !environment.IsInAzureFunctions() {
+		if err := validation.TestOpaPolicyInstallation(); err != nil {
 			zap.L().Error(err.Error())
 			return
+		}
+
+		if !environment.GetDisableTerraformCliConfig() {
+			if err := validation.TestFileSystemProviderInstallation(); err != nil {
+				zap.L().Error(err.Error())
+				return
+			}
 		}
 	}
 
