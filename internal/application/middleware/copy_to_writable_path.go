@@ -10,10 +10,16 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
+// CopyToWritablePath copies the binaries to a writeable, temporary location.
+// This service relies on a number of binary files like OPA and terraform providers.
+// When running in Azure functions, the file system is read-only.
+// Copying files to the temp dir allows us to set the executable flag on the files.
 func CopyToWritablePath(c *gin.Context) {
 	if !environment.IsInAzureFunctions() {
+		// Nothing to do when running locally
 		c.Next()
 		return
 	}
@@ -26,6 +32,7 @@ func CopyToWritablePath(c *gin.Context) {
 	binariesExists, err := dirExists(binariesDestPath)
 
 	if err != nil {
+		zap.L().Error("Failed to test the presence of the binaries directory", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the binaries directory", err))
 		c.Abort()
 		return
@@ -34,6 +41,7 @@ func CopyToWritablePath(c *gin.Context) {
 	if !binariesExists {
 		// Create the binaries directory in temp
 		if err := os.MkdirAll(binariesDestPath, 0755); err != nil {
+			zap.L().Error("Failed to create the binaries directory", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the binaries directory", err))
 			c.Abort()
 			return
@@ -41,6 +49,7 @@ func CopyToWritablePath(c *gin.Context) {
 
 		// Recursively copy the binaries directory
 		if err := copyDir("binaries", binariesDestPath); err != nil {
+			zap.L().Error("Failed to copy the binaries directory", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the binaries directory", err))
 			c.Abort()
 			return
@@ -50,6 +59,7 @@ func CopyToWritablePath(c *gin.Context) {
 	providersExists, err := dirExists(providerDestPath)
 
 	if err != nil {
+		zap.L().Error("Failed to test the presence of the providers directory", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the providers directory", err))
 		c.Abort()
 		return
@@ -58,6 +68,7 @@ func CopyToWritablePath(c *gin.Context) {
 	if !providersExists {
 		// Create the provider directory in temp
 		if err := os.MkdirAll(providerDestPath, 0755); err != nil {
+			zap.L().Error("Failed to create the provider directory", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the provider directory", err))
 			c.Abort()
 			return
@@ -65,6 +76,7 @@ func CopyToWritablePath(c *gin.Context) {
 
 		// Recursively copy the provider directory
 		if err := copyDir("provider", providerDestPath); err != nil {
+			zap.L().Error("Failed to copy the provider directory", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the provider directory", err))
 			c.Abort()
 			return
@@ -113,13 +125,21 @@ func copyFile(src, dst string, mode os.FileMode) error {
 	if err != nil {
 		return err
 	}
-	defer srcFile.Close()
+	defer func() {
+		if err := srcFile.Close(); err != nil {
+			zap.L().Error("Failed to close the file ", zap.Error(err))
+		}
+	}()
 
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
-	defer dstFile.Close()
+	defer func() {
+		if err := dstFile.Close(); err != nil {
+			zap.L().Error("Failed to close the file ", zap.Error(err))
+		}
+	}()
 
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
 		return err
