@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
@@ -11,8 +14,6 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
 )
 
 func CreateTerraformApply(server string, token string, apiKey string, terraformApply model.TerraformApply) (*model.TerraformApply, error) {
@@ -66,8 +67,14 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		}
 	}
 
+	tofu, err := environment.GetTofuExecutable()
+
+	if err != nil {
+		return nil, err
+	}
+
 	_, _, _, err = execute.Execute(
-		environment.GetTofuExecutable(),
+		tofu,
 		[]string{
 			"-chdir=" + tempDir,
 			"init",
@@ -84,7 +91,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	}
 
 	stdout, stderr, _, err := execute.Execute(
-		environment.GetTofuExecutable(),
+		tofu,
 		[]string{
 			"-chdir=" + tempDir,
 			"apply",

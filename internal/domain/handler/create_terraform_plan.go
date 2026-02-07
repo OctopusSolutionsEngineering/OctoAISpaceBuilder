@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/customerrors"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/environment"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/execute"
@@ -16,9 +20,6 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/infrastructure"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
@@ -109,8 +110,14 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 	zap.L().Info("Init tofu")
 
+	tofu, err := environment.GetTofuExecutable()
+
+	if err != nil {
+		return nil, err
+	}
+
 	stdOut, stdErr, _, err := execute.Execute(
-		environment.GetTofuExecutable(),
+		tofu,
 		[]string{
 			"-chdir=" + tempDir,
 			"init",
@@ -140,8 +147,14 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 
 	planFile := filepath.Join(tempDir, "tfplan")
 
+	tofu, err := environment.GetTofuExecutable()
+
+	if err != nil {
+		return "", nil, err
+	}
+
 	stdOut, stdErr, _, err := execute.Execute(
-		environment.GetTofuExecutable(),
+		tofu,
 		[]string{
 			"-chdir=" + tempDir,
 			"plan",
@@ -183,8 +196,14 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 func generatePlanJson(tempDir string, planFile string) (string, error) {
 	zap.L().Info("Generating plan JSON")
 
+	tofu, err := environment.GetTofuExecutable()
+
+	if err != nil {
+		return "", err
+	}
+
 	planJsonStdOut, stdErr, _, err := execute.Execute(
-		environment.GetTofuExecutable(),
+		tofu,
 		[]string{
 			"-chdir=" + tempDir,
 			"show",
@@ -206,8 +225,14 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 func generatePlanText(tempDir string, planFile string) (string, error) {
 	zap.L().Info("Generating plan text")
 
+	tofu, err := environment.GetTofuExecutable()
+
+	if err != nil {
+		return "", err
+	}
+
 	planStdOut, stdErr, _, err := execute.Execute(
-		environment.GetTofuExecutable(),
+		tofu,
 		[]string{
 			"-chdir=" + tempDir,
 			"show",
