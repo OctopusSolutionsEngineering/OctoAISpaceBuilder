@@ -58,8 +58,8 @@ func GetInstallationDirectory() (string, error) {
 	}
 
 	if IsInAzureFunctions() {
-		// In Azure Functions, everything is in the current working directory
-		return cwd, nil
+		// In Azure Functions, all files are copied to the temp location
+		return os.TempDir(), nil
 	}
 
 	// When running locally, the policies and other files are in the "functions" directory.
