@@ -32,7 +32,7 @@ func CopyToWritablePath(c *gin.Context) {
 
 	for _, dir := range dirs {
 
-		destPath := filepath.Join(tempDir, "dir")
+		destPath := filepath.Join(tempDir, dir)
 
 		exists, err := pathExists(destPath)
 
