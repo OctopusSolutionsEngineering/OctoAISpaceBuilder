@@ -44,7 +44,7 @@ func CopyToWritablePath(c *gin.Context) {
 		}
 
 		if !exists {
-			zap.L().Info("Copying the "+destPath+" directory", zap.Error(err))
+			zap.L().Info("Copying "+dir+" to "+destPath, zap.Error(err))
 
 			// Create the directory in temp
 			if err := os.MkdirAll(destPath, 0755); err != nil {
