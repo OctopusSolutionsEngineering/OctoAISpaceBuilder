@@ -130,12 +130,14 @@ func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 		})
 
 	if err != nil {
+		zap.L().Error("Failed to init: "+stdErr+" "+stdOut, zap.Error(err))
 		return nil, errors.New("Failed to init: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
 	lockFile, err := os.ReadFile(filepath.Join(tempDir, ".terraform.lock.hcl"))
 
 	if err != nil {
+		zap.L().Error("Failed to get lock file: "+stdErr, zap.Error(err))
 		return nil, errors.New("Failed to get lock file: " + stdErr)
 	}
 
@@ -181,6 +183,7 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 	logging.LogEnhanced(stdOut, aud)
 
 	if err != nil {
+		zap.L().Error("Failed to generate plan: "+stdErr+" "+stdOut, zap.Error(err))
 		return "", nil, errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
@@ -216,6 +219,7 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 		})
 
 	if err != nil {
+		zap.L().Error("Failed to generate plan json: "+stdErr+" "+planJsonStdOut, zap.Error(err))
 		return "", errors.New("Failed to generate plan json: " + stdErr + " " + planJsonStdOut + " " + err.Error())
 	}
 
@@ -244,6 +248,7 @@ func generatePlanText(tempDir string, planFile string) (string, error) {
 		})
 
 	if err != nil {
+		zap.L().Error("Failed to generate plan text: "+stdErr+" "+planStdOut, zap.Error(err))
 		return "", errors.New("Failed to generate plan text: " + stdErr + " " + planStdOut + " " + err.Error())
 	}
 
@@ -288,6 +293,7 @@ func checkPlan(planJson string, server string) error {
 		map[string]string{})
 
 	if err != nil {
+		zap.L().Error("Failed to check the plan", zap.Error(err))
 		return err
 	}
 
