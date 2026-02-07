@@ -1,16 +1,24 @@
 package environment
 
 import (
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 	"os"
+	"path/filepath"
+
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 )
 
-func GetOpaExecutable() string {
+func GetOpaExecutable() (string, error) {
 	if os.Getenv("SPACEBUILDER_OPA_PATH") != "" {
-		return os.Getenv("SPACEBUILDER_OPA_PATH")
+		return os.Getenv("SPACEBUILDER_OPA_PATH"), nil
 	}
 
-	return "binaries/opa_linux_amd64"
+	installDir, err := GetInstallationDirectory()
+
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(installDir, "binaries/opa_linux_amd64"), nil
 }
 
 func GetOpaPolicyPath() string {

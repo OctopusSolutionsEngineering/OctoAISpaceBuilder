@@ -280,8 +280,14 @@ func checkPlan(planJson string, server string) error {
 		return err
 	}
 
+	opaPath, err := environment.GetOpaExecutable()
+
+	if err != nil {
+		return err
+	}
+
 	checkStdOut, _, exitCode, err := execute.Execute(
-		environment.GetOpaExecutable(),
+		opaPath,
 		[]string{
 			"exec",
 			"--fail",
