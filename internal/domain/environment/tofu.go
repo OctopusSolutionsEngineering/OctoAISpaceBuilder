@@ -2,7 +2,8 @@ package environment
 
 import (
 	"os"
-	"path/filepath"
+
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 )
 
 func GetTofuExecutable() (string, error) {
@@ -16,5 +17,5 @@ func GetTofuExecutable() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(path, "binaries/tofu"), nil
+	return files.GetAbsoluteOrRelativePath(path, "binaries/tofu"), nil
 }

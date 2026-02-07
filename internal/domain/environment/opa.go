@@ -2,7 +2,6 @@ package environment
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
 )
@@ -18,7 +17,7 @@ func GetOpaExecutable() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(installDir, "binaries/opa_linux_amd64"), nil
+	return files.GetAbsoluteOrRelativePath(installDir, "binaries/opa_linux_amd64"), nil
 }
 
 func GetOpaPolicyPath() string {
