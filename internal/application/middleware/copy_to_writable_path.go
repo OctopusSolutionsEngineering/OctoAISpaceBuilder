@@ -28,6 +28,7 @@ func CopyToWritablePath(c *gin.Context) {
 	tempDir := os.TempDir()
 	binariesDestPath := filepath.Join(tempDir, "binaries")
 	providerDestPath := filepath.Join(tempDir, "provider")
+	policyDestPath := filepath.Join(tempDir, "policy")
 
 	binariesExists, err := dirExists(binariesDestPath)
 
@@ -78,6 +79,33 @@ func CopyToWritablePath(c *gin.Context) {
 		if err := copyDir("provider", providerDestPath); err != nil {
 			zap.L().Error("Failed to copy the provider directory", zap.Error(err))
 			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the provider directory", err))
+			c.Abort()
+			return
+		}
+	}
+
+	policyExists, err := dirExists(policyDestPath)
+
+	if err != nil {
+		zap.L().Error("Failed to test the presence of the providers directory", zap.Error(err))
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the policy directory", err))
+		c.Abort()
+		return
+	}
+
+	if !policyExists {
+		// Create the provider directory in temp
+		if err := os.MkdirAll(policyDestPath, 0755); err != nil {
+			zap.L().Error("Failed to create the provider directory", zap.Error(err))
+			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the policy directory", err))
+			c.Abort()
+			return
+		}
+
+		// Recursively copy the provider directory
+		if err := copyDir("policy", policyDestPath); err != nil {
+			zap.L().Error("Failed to copy the provider directory", zap.Error(err))
+			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the policy directory", err))
 			c.Abort()
 			return
 		}
