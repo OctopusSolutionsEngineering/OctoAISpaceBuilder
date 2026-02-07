@@ -25,89 +25,40 @@ func CopyToWritablePath(c *gin.Context) {
 	}
 
 	// Get the temporary directory
+
 	tempDir := os.TempDir()
-	binariesDestPath := filepath.Join(tempDir, "binaries")
-	providerDestPath := filepath.Join(tempDir, "provider")
-	policyDestPath := filepath.Join(tempDir, "policy")
 
-	binariesExists, err := dirExists(binariesDestPath)
+	dirs := []string{"binaries", "provider", "policy"}
 
-	if err != nil {
-		zap.L().Error("Failed to test the presence of the binaries directory", zap.Error(err))
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the binaries directory", err))
-		c.Abort()
-		return
-	}
+	for _, dir := range dirs {
 
-	if !binariesExists {
-		// Create the binaries directory in temp
-		if err := os.MkdirAll(binariesDestPath, 0755); err != nil {
-			zap.L().Error("Failed to create the binaries directory", zap.Error(err))
-			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the binaries directory", err))
+		destPath := filepath.Join(tempDir, "dir")
+
+		exists, err := dirExists(destPath)
+
+		if err != nil {
+			zap.L().Error("Failed to test the presence of the "+dir+" directory", zap.Error(err))
+			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the "+dir+" directory", err))
 			c.Abort()
 			return
 		}
 
-		// Recursively copy the binaries directory
-		if err := copyDir("binaries", binariesDestPath); err != nil {
-			zap.L().Error("Failed to copy the binaries directory", zap.Error(err))
-			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the binaries directory", err))
-			c.Abort()
-			return
-		}
-	}
+		if !exists {
+			// Create the directory in temp
+			if err := os.MkdirAll(destPath, 0755); err != nil {
+				zap.L().Error("Failed to create the "+dir+" directory", zap.Error(err))
+				c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the "+dir+" directory", err))
+				c.Abort()
+				return
+			}
 
-	providersExists, err := dirExists(providerDestPath)
-
-	if err != nil {
-		zap.L().Error("Failed to test the presence of the providers directory", zap.Error(err))
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the providers directory", err))
-		c.Abort()
-		return
-	}
-
-	if !providersExists {
-		// Create the provider directory in temp
-		if err := os.MkdirAll(providerDestPath, 0755); err != nil {
-			zap.L().Error("Failed to create the provider directory", zap.Error(err))
-			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the provider directory", err))
-			c.Abort()
-			return
-		}
-
-		// Recursively copy the provider directory
-		if err := copyDir("provider", providerDestPath); err != nil {
-			zap.L().Error("Failed to copy the provider directory", zap.Error(err))
-			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the provider directory", err))
-			c.Abort()
-			return
-		}
-	}
-
-	policyExists, err := dirExists(policyDestPath)
-
-	if err != nil {
-		zap.L().Error("Failed to test the presence of the providers directory", zap.Error(err))
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to test the presence of the policy directory", err))
-		c.Abort()
-		return
-	}
-
-	if !policyExists {
-		// Create the provider directory in temp
-		if err := os.MkdirAll(policyDestPath, 0755); err != nil {
-			zap.L().Error("Failed to create the provider directory", zap.Error(err))
-			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to create the policy directory", err))
-			c.Abort()
-			return
-		}
-
-		// Recursively copy the provider directory
-		if err := copyDir("policy", policyDestPath); err != nil {
-			zap.L().Error("Failed to copy the provider directory", zap.Error(err))
-			c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the policy directory", err))
-			c.Abort()
-			return
+			// Recursively copy the directory
+			if err := copyDir("binaries", destPath); err != nil {
+				zap.L().Error("Failed to copy the binaries directory", zap.Error(err))
+				c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to copy the binaries directory", err))
+				c.Abort()
+				return
+			}
 		}
 	}
 
