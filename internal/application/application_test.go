@@ -166,7 +166,7 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 			router.ServeHTTP(w, applyReq)
 
 			// Assert status code
-			assert.Equal(t, 201, w.Code)
+			assert.Equal(t, 201, w.Code, w.Body.String())
 
 			// Assert response
 			var applyResponse model.TerraformApply
@@ -280,7 +280,7 @@ func TestTerraformAutoApplyEndpoint(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			// Assert status code
-			assert.Equal(t, 201, w.Code)
+			assert.Equal(t, 201, w.Code, w.Body.String())
 
 			var response model.TerraformApply
 			err = jsonapi.Unmarshal(w.Body.Bytes(), &response)
