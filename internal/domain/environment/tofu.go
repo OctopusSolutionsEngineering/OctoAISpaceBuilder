@@ -17,5 +17,5 @@ func GetTofuExecutable() (string, error) {
 		return "", err
 	}
 
-	return files.GetAbsoluteOrRelativePath(path, "binaries/tofu"), nil
+	return files.GetAbsoluteOrRelativePath("binaries/tofu", path), nil
 }

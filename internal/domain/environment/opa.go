@@ -17,7 +17,7 @@ func GetOpaExecutable() (string, error) {
 		return "", err
 	}
 
-	return files.GetAbsoluteOrRelativePath(installDir, "binaries/opa_linux_amd64"), nil
+	return files.GetAbsoluteOrRelativePath("binaries/opa_linux_amd64", installDir), nil
 }
 
 func GetOpaPolicyPath() string {

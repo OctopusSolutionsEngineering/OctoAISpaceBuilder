@@ -2,6 +2,7 @@ package environment
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,12 @@ import (
 func TestGetTofuExecutable(t *testing.T) {
 	// Save original environment variable to restore later
 	originalTofuPath := os.Getenv("SPACEBUILDER_TOFU_PATH")
+
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		t.Fatalf("Failed to get current working directory: %v", err)
+	}
 
 	// Clean up after the test
 	defer func() {
@@ -29,7 +36,7 @@ func TestGetTofuExecutable(t *testing.T) {
 		{
 			name:         "uses default path when environment variable is not set",
 			tofuPath:     "",
-			expectedPath: "binaries/tofu",
+			expectedPath: filepath.Join(cwd, "functions/binaries/tofu"),
 		},
 	}
 
