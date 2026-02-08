@@ -104,12 +104,12 @@ jobs:
 #          gotestsum --junitfile results.xml -- -v -coverprofile=coverage.out -coverpkg=github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/... -timeout 0 -json ./...
 #          go tool cover -html=coverage.out -o=coverage.html
 #          go tool cover -func=coverage.out -o=coverage.out
-        shell: bash
-        env:
-          OCTO_MSSQLTAG: 2022-latest
-          GOMAXPROCS: 2
-          LICENSE: ${{ secrets.LICENSE }}
-          AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
+#        shell: bash
+#        env:
+#          OCTO_MSSQLTAG: 2022-latest
+#          GOMAXPROCS: 2
+#          LICENSE: ${{ secrets.LICENSE }}
+#          AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
 
       - name: Build Docker image
         run: docker build -t ghcr.io/octopussolutionsengineering/spacebuilder:${{ steps.determine_version.outputs.semVer }}-${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }} .
