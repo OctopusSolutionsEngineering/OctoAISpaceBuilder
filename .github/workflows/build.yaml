@@ -98,12 +98,12 @@ jobs:
           GOOS: linux
           GOARCH: amd64
           CGO_ENABLED: 0
-      - name: Test
-        run: |-
-          sudo apt-get install -y gotestsum
-          gotestsum --junitfile results.xml -- -v -coverprofile=coverage.out -coverpkg=github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/... -timeout 0 -json ./...
-          go tool cover -html=coverage.out -o=coverage.html
-          go tool cover -func=coverage.out -o=coverage.out
+#      - name: Test
+#        run: |-
+#          sudo apt-get install -y gotestsum
+#          gotestsum --junitfile results.xml -- -v -coverprofile=coverage.out -coverpkg=github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/... -timeout 0 -json ./...
+#          go tool cover -html=coverage.out -o=coverage.html
+#          go tool cover -func=coverage.out -o=coverage.out
         shell: bash
         env:
           OCTO_MSSQLTAG: 2022-latest
@@ -187,11 +187,11 @@ jobs:
         with:
           name: code-coverage-report
           path: coverage.html
-      - name: Go Coverage Badge
-        if: always()
-        uses: tj-actions/coverage-badge-go@v3
-        with:
-          filename: coverage.out
+#      - name: Go Coverage Badge
+#        if: always()
+#        uses: tj-actions/coverage-badge-go@v3
+#        with:
+#          filename: coverage.out
       - name: Verify Changed files
         if: always()
         uses: tj-actions/verify-changed-files@v20

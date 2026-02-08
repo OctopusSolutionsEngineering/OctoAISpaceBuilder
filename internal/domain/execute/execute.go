@@ -3,11 +3,12 @@ package execute
 import (
 	"bytes"
 	"fmt"
-	"go.uber.org/zap"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
+
+	"go.uber.org/zap"
 )
 
 func Execute(executable string, args []string, env map[string]string) (string, string, int, error) {
@@ -30,6 +31,7 @@ func Execute(executable string, args []string, env map[string]string) (string, s
 	exitCode := 0
 
 	if err != nil {
+		zap.L().Error("Error executing command", zap.String("command", executable), zap.Error(err))
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			// Get the exit code from the wait status
 			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
