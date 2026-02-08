@@ -39,7 +39,11 @@ func TestGetOpaExecutable(t *testing.T) {
 			os.Setenv("SPACEBUILDER_OPA_PATH", tt.opaPath)
 
 			// Call the function under test
-			path := GetOpaExecutable()
+			path, err := GetOpaExecutable()
+
+			if err != nil {
+				t.Fatalf("GetOpaExecutable returned an error: %v", err)
+			}
 
 			// Assert
 			assert.Equal(t, tt.expectedPath, path)

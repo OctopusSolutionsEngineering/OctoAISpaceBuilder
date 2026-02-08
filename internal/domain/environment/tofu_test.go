@@ -39,7 +39,11 @@ func TestGetTofuExecutable(t *testing.T) {
 			os.Setenv("SPACEBUILDER_TOFU_PATH", tt.tofuPath)
 
 			// Call the function under test
-			path := GetTofuExecutable()
+			path, err := GetTofuExecutable()
+
+			if err != nil {
+				t.Fatalf("GetTofuExecutable returned an error: %v", err)
+			}
 
 			// Assert
 			assert.Equal(t, tt.expectedPath, path)
