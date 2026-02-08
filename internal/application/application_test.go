@@ -2,6 +2,13 @@ package application
 
 import (
 	"bytes"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"testing"
+
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
@@ -9,11 +16,6 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 // TestTerraformPlanAndApplyEndpoint plans and then applies a terraform configuration via the application
@@ -171,6 +173,7 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 			err = jsonapi.Unmarshal(w.Body.Bytes(), &applyResponse)
 
 			if err != nil {
+				fmt.Println("Terraform apply response was " + w.Body.String())
 				return err
 			}
 
