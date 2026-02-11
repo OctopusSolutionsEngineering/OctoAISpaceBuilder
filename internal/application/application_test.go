@@ -12,6 +12,7 @@ import (
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,8 @@ import (
 // TestTerraformPlanAndApplyEndpoint plans and then applies a terraform configuration via the application
 // level Gin interface.
 func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
+	logging.ConfigureZapLogger()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("Failed to get cwd: %v", err)
@@ -189,6 +192,8 @@ func TestTerraformPlanAndApplyEndpoint(t *testing.T) {
 // TestTerraformAutoApplyEndpoint autoapplies a terraform configuration via the application
 // level Gin interface.
 func TestTerraformAutoApplyEndpoint(t *testing.T) {
+	logging.ConfigureZapLogger()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("Failed to get cwd: %v", err)
@@ -299,6 +304,7 @@ func TestTerraformAutoApplyEndpoint(t *testing.T) {
 }
 
 func TestHealthEndpoint(t *testing.T) {
+	logging.ConfigureZapLogger()
 
 	// Set up Gin in test mode
 	gin.SetMode(gin.TestMode)
@@ -336,6 +342,7 @@ func TestHealthEndpoint(t *testing.T) {
 }
 
 func TestRootEndpoint(t *testing.T) {
+	logging.ConfigureZapLogger()
 
 	// Set up Gin in test mode
 	gin.SetMode(gin.TestMode)

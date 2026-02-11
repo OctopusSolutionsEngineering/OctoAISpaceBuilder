@@ -2,20 +2,24 @@ package domain
 
 import (
 	"errors"
-	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/customerrors"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
-	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
-	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/OctopusDeploy/go-octopusdeploy/v2/pkg/client"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/customerrors"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/files"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
+	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
 )
 
 // TestPopulateSpaceWithK8sProject creates a space and populates it via the domain level handlers.
 func TestPopulateSpaceWithK8sProject(t *testing.T) {
+	logging.ConfigureZapLogger()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("Failed to get cwd: %v", err)
@@ -102,6 +106,8 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 // TestInvalidCustomSecretsProject attempts to create a space and populate it with a project that has custom secrets.
 // This must fail, as we do not support sending sensitive values.
 func TestInvalidCustomSecretsProject(t *testing.T) {
+	logging.ConfigureZapLogger()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("Failed to get cwd: %v", err)
@@ -177,6 +183,8 @@ func TestInvalidCustomSecretsProject(t *testing.T) {
 
 // TestInvalidProviderProject attempts to create resources using prohibited providers.
 func TestInvalidProviderProject(t *testing.T) {
+	logging.ConfigureZapLogger()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("Failed to get cwd: %v", err)
