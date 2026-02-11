@@ -109,7 +109,7 @@ jobs:
           OCTO_MSSQLTAG: 2022-latest
           GOMAXPROCS: 2
           LICENSE: ${{ secrets.LICENSE }}
-          AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
+          AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
 
       - name: Build Docker image
         run: docker build -t ghcr.io/octopussolutionsengineering/spacebuilder:${{ steps.determine_version.outputs.semVer }}-${{ steps.determine_version.outputs.ShortSha }}.${{ github.run_number }}.${{ github.run_attempt }} .
