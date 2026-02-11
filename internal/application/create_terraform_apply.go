@@ -1,14 +1,15 @@
 package application
 
 import (
+	"io"
+	"net/http"
+
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
 )
 
 func CreateTerraformApply(c *gin.Context) {
@@ -17,7 +18,7 @@ func CreateTerraformApply(c *gin.Context) {
 
 	if err != nil {
 		zap.L().Error("Failed to read request body", zap.Error(err))
-		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
+		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to read request body", err))
 		return
 	}
 
@@ -26,7 +27,7 @@ func CreateTerraformApply(c *gin.Context) {
 
 	if err != nil {
 		zap.L().Error("Failed to unmarshal JSON API body", zap.Error(err))
-		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
+		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to unmarshal JSON API body", err))
 		return
 	}
 
@@ -34,7 +35,7 @@ func CreateTerraformApply(c *gin.Context) {
 
 	if err != nil {
 		zap.L().Error("Failed to get the Octopus details", zap.Error(err))
-		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to process request", err))
+		c.IndentedJSON(http.StatusBadRequest, responses.GenerateError("Failed to get the Octopus details", err))
 		return
 	}
 
@@ -42,7 +43,7 @@ func CreateTerraformApply(c *gin.Context) {
 
 	if err != nil {
 		zap.L().Error("Failed to perform Terraform apply", zap.Error(err))
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to perform Terraform apply", err))
 		return
 	}
 
@@ -50,7 +51,7 @@ func CreateTerraformApply(c *gin.Context) {
 
 	if err != nil {
 		zap.L().Error("Failed to marshal JSON API response", zap.Error(err))
-		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
+		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to marshal JSON API response", err))
 		return
 	}
 
