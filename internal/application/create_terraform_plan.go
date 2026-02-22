@@ -1,14 +1,16 @@
 package application
 
 import (
+	"io"
+	"net/http"
+
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
+	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
 )
 
 func CreateTerraformPlan(c *gin.Context) {
@@ -31,6 +33,8 @@ func CreateTerraformPlan(c *gin.Context) {
 	}
 
 	server, token, apiKey, err := getServerTokenApiKey(c)
+
+	logging.SaveEnhanced(terraformInput.Configuration, server)
 
 	response, err := handler.CreateTerraformPlan(server, token, apiKey, terraformInput)
 

@@ -51,3 +51,5 @@ main
 
 .vscode/
 cmd/web/__debug_bin*
+
+*.log
