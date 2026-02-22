@@ -97,3 +97,8 @@ func GetEnhancedLoggingInstances() []string {
 
 	return instances
 }
+
+// GetPersistEnhancedLogs returns true if the service should save enhanced logs to disk, or false otherwise.
+func GetPersistEnhancedLogs() bool {
+	return strings.ToLower(os.Getenv("PERSIST_ENHANCED_LOGS")) == "true"
+}

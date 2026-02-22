@@ -40,8 +40,9 @@ func LogEnhanced(log string, server string) {
 
 func SaveEnhanced(content string, server string) {
 	enhancedLogging := IsEnhancedLoggingEnabled(server)
+	shouldPersist := environment.GetPersistEnhancedLogs()
 
-	if !enhancedLogging {
+	if !enhancedLogging || !shouldPersist {
 		return
 	}
 
