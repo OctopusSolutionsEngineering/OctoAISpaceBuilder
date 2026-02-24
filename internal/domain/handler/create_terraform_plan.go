@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/customerrors"
@@ -65,7 +66,7 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		return nil, err
 	}
 
-	planFile, planBinary, err := generatePlan(cliConfigFile, tempDir, token, apiKey, server, terraformInput.SpaceId)
+	planFile, planBinary, err := generatePlanLoop(cliConfigFile, tempDir, token, apiKey, server, terraformInput.SpaceId, 0)
 
 	if err != nil {
 		return nil, err
@@ -144,7 +145,17 @@ func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 	return lockFile, nil
 }
 
-func generatePlan(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, error) {
+func generatePlanLoop(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string, retry int) (string, []byte, error) {
+	planFile, planBinary, output, err := generatePlan(cliConfigFile, tempDir, token, apiKey, aud, spaceId)
+
+	if err != nil && retry < 2 && strings.Contains(output, "handshake timeout") {
+		return generatePlanLoop(cliConfigFile, tempDir, token, apiKey, aud, spaceId, retry+1)
+	}
+
+	return planFile, planBinary, err
+}
+
+func generatePlan(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, string, error) {
 	zap.L().Info("Generating plan for " + aud)
 
 	planFile := filepath.Join(tempDir, "tfplan")
@@ -152,7 +163,7 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 	tofu, err := environment.GetTofuExecutable()
 
 	if err != nil {
-		return "", nil, err
+		return "", nil, "", err
 	}
 
 	stdOut, stdErr, _, err := execute.Execute(
@@ -184,16 +195,16 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 
 	if err != nil {
 		zap.L().Error("Failed to generate plan: "+stdErr+" "+stdOut, zap.Error(err))
-		return "", nil, errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
+		return "", nil, "", errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
 	}
 
 	plan, err := os.ReadFile(planFile)
 
 	if err != nil {
-		return "", nil, err
+		return "", nil, "", err
 	}
 
-	return planFile, plan, nil
+	return planFile, plan, stdOut + "\n" + stdErr, nil
 }
 
 func generatePlanJson(tempDir string, planFile string) (string, error) {
