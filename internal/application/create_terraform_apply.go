@@ -3,6 +3,7 @@ package application
 import (
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
@@ -39,7 +40,7 @@ func CreateTerraformApply(c *gin.Context) {
 		return
 	}
 
-	response, err := handler.CreateTerraformApply(server, token, apiKey, terraform)
+	response, err := createTerraformApply(server, token, apiKey, terraform, 0)
 
 	if err != nil {
 		zap.L().Error("Failed to perform Terraform apply", zap.Error(err))
@@ -57,4 +58,15 @@ func CreateTerraformApply(c *gin.Context) {
 
 	c.Header("Content-Type", "application/vnd.api+json")
 	c.String(http.StatusCreated, string(responseJSON))
+}
+
+func createTerraformApply(server, token, apiKey string, terraform model.TerraformApply, retry int) (*model.TerraformApply, error) {
+	response, err := handler.CreateTerraformApply(server, token, apiKey, terraform)
+
+	// Retry if there was a connection failure
+	if err != nil && response != nil && response.ApplyText != nil && strings.Contains(*response.ApplyText, "handshake timeout") && retry < 2 {
+		return createTerraformApply(server, token, apiKey, terraform, retry+1)
+	}
+
+	return response, err
 }

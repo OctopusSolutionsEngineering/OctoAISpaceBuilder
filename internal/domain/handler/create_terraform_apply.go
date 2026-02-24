@@ -127,11 +127,13 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		zap.L().Error("Failed to delete terraform plan", zap.Error(err))
 	}
 
+	applyText := stdout + "\n" + stderr
+
 	response := model.TerraformApply{
 		ID:        uuid.New().String(),
 		PlanId:    terraformApply.PlanId,
 		Server:    terraformApply.Server,
-		ApplyText: &stdout,
+		ApplyText: &applyText,
 	}
 
 	return &response, nil
