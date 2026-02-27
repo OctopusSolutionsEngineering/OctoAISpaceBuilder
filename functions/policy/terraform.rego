@@ -59,7 +59,7 @@ custom_sensitive_vars[msg] if {
     actual_value != "octopussolutionsengineering"
 
     # Variable references are ok
-    not regex.match(`^#\{[^}]+\}$`, actual_value)
+    not regex.match(`^#\{[^}|]+\}$`, actual_value)
 
     # This is a generic GUID placeholder
     actual_value != "00000000-0000-0000-0000-000000000000"
