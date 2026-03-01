@@ -3,7 +3,6 @@ package application
 import (
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/DataDog/jsonapi"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/application/responses"
@@ -64,7 +63,7 @@ func createTerraformApply(server, token, apiKey string, terraform model.Terrafor
 	response, err := handler.CreateTerraformApply(server, token, apiKey, terraform)
 
 	// Retry if there was a connection failure
-	if err != nil && response != nil && response.ApplyText != nil && strings.Contains(*response.ApplyText, "handshake timeout") && retry < 2 {
+	if err != nil && response != nil && response.ApplyText != nil && handler.IsFlakyNetworkError(*response.ApplyText) && retry < 2 {
 		return createTerraformApply(server, token, apiKey, terraform, retry+1)
 	}
 

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/customerrors"
@@ -148,7 +147,7 @@ func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 func generatePlanLoop(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string, retry int) (string, []byte, error) {
 	planFile, planBinary, output, err := generatePlan(cliConfigFile, tempDir, token, apiKey, aud, spaceId)
 
-	if err != nil && retry < 2 && strings.Contains(output, "handshake timeout") {
+	if err != nil && retry < 2 && IsFlakyNetworkError(output) {
 		return generatePlanLoop(cliConfigFile, tempDir, token, apiKey, aud, spaceId, retry+1)
 	}
 
