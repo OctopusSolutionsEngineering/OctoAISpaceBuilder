@@ -60,10 +60,10 @@ func CreateTerraformApply(c *gin.Context) {
 }
 
 func createTerraformApply(server, token, apiKey string, terraform model.TerraformApply, retry int) (*model.TerraformApply, error) {
-	response, err := handler.CreateTerraformApply(server, token, apiKey, terraform)
+	response, err, output := handler.CreateTerraformApply(server, token, apiKey, terraform)
 
 	// Retry if there was a connection failure
-	if err != nil && response != nil && response.ApplyText != nil && handler.IsFlakyNetworkError(*response.ApplyText) && retry < 2 {
+	if err != nil && handler.IsFlakyNetworkError(output) && retry < 2 {
 		return createTerraformApply(server, token, apiKey, terraform, retry+1)
 	}
 

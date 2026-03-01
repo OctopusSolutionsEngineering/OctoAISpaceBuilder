@@ -45,7 +45,7 @@ func CreateTerraformAutoApply(c *gin.Context) {
 		PlanId: response.ID,
 	}
 
-	applyResponse, err := handler.CreateTerraformApply(server, token, apiKey, terraformApply)
+	applyResponse, err, _ := handler.CreateTerraformApply(server, token, apiKey, terraformApply)
 
 	if err != nil {
 		zap.L().Error("Failed to perform Terraform apply", zap.Error(err))

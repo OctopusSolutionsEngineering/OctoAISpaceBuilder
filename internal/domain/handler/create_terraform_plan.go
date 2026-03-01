@@ -145,16 +145,16 @@ func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 }
 
 func generatePlanLoop(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string, retry int) (string, []byte, error) {
-	planFile, planBinary, output, err := generatePlan(cliConfigFile, tempDir, token, apiKey, aud, spaceId)
+	planFile, planBinary, err, logs := generatePlan(cliConfigFile, tempDir, token, apiKey, aud, spaceId)
 
-	if err != nil && retry < 2 && IsFlakyNetworkError(output) {
+	if err != nil && retry < 2 && IsFlakyNetworkError(logs) {
 		return generatePlanLoop(cliConfigFile, tempDir, token, apiKey, aud, spaceId, retry+1)
 	}
 
 	return planFile, planBinary, err
 }
 
-func generatePlan(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, string, error) {
+func generatePlan(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, error, string) {
 	zap.L().Info("Generating plan for " + aud)
 
 	planFile := filepath.Join(tempDir, "tfplan")
@@ -162,7 +162,7 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 	tofu, err := environment.GetTofuExecutable()
 
 	if err != nil {
-		return "", nil, "", err
+		return "", nil, err, ""
 	}
 
 	stdOut, stdErr, _, err := execute.Execute(
@@ -194,16 +194,16 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 
 	if err != nil {
 		zap.L().Error("Failed to generate plan: "+stdErr+" "+stdOut, zap.Error(err))
-		return "", nil, "", errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error())
+		return "", nil, errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error()), stdOut + "\n" + stdErr
 	}
 
 	plan, err := os.ReadFile(planFile)
 
 	if err != nil {
-		return "", nil, "", err
+		return "", nil, err, ""
 	}
 
-	return planFile, plan, stdOut + "\n" + stdErr, nil
+	return planFile, plan, nil, stdOut + "\n" + stdErr
 }
 
 func generatePlanJson(tempDir string, planFile string) (string, error) {

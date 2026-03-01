@@ -16,14 +16,14 @@ import (
 	"go.uber.org/zap"
 )
 
-func CreateTerraformApply(server string, token string, apiKey string, terraformApply model.TerraformApply) (*model.TerraformApply, error) {
+func CreateTerraformApply(server string, token string, apiKey string, terraformApply model.TerraformApply) (*model.TerraformApply, error, string) {
 
 	terraformApply.Server = sha.GetSha256Hash(server)
 
 	tempDir, err := files.CreateTempDir()
 
 	if err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	defer func() {
@@ -39,23 +39,23 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	planContents, lockFile, configuration, err := infrastructure.ReadPlanAzureStorageBlob(terraformApply.PlanId)
 
 	if err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	if err := os.WriteFile(planFile, planContents, 0644); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	if err := os.WriteFile(lockFileName, lockFile, 0644); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	if err := os.WriteFile(configurationFileName, configuration, 0644); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	if err := terraform.WriteOverrides(tempDir); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	var cliConfigFile = ""
@@ -63,17 +63,17 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		cliConfigFile, err = terraform.CreateTerraformRcFile()
 
 		if err != nil {
-			return nil, err
+			return nil, err, ""
 		}
 	}
 
 	tofu, err := environment.GetTofuExecutable()
 
 	if err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
-	_, _, _, err = execute.Execute(
+	stdout, stderr, _, err := execute.Execute(
 		tofu,
 		[]string{
 			"-chdir=" + tempDir,
@@ -87,10 +87,10 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		})
 
 	if err != nil {
-		return nil, err
+		return nil, err, stdout + "\n" + stderr
 	}
 
-	stdout, stderr, _, err := execute.Execute(
+	stdout, stderr, _, err = execute.Execute(
 		tofu,
 		[]string{
 			"-chdir=" + tempDir,
@@ -118,7 +118,7 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 	logging.LogEnhanced(stderr, server)
 
 	if err != nil {
-		return nil, err
+		return nil, err, stdout + "\n" + stderr
 	}
 
 	if err := infrastructure.DeletePlanAzureStorageBlob(terraformApply.PlanId); err != nil {
@@ -136,5 +136,5 @@ func CreateTerraformApply(server string, token string, apiKey string, terraformA
 		ApplyText: &applyText,
 	}
 
-	return &response, nil
+	return &response, nil, ""
 }
