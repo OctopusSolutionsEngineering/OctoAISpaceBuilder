@@ -33,7 +33,7 @@ jobs:
           terraform_wrapper: false
       - name: Install OPA
         run: |
-          curl -L -o opa https://openpolicyagent.org/downloads/v1.3.0/opa_linux_amd64_static
+          curl -L -o opa https://openpolicyagent.org/downloads/v1.41.1/opa_linux_amd64_static
           sudo install -o root -g root -m 0755 opa /usr/local/bin/opa
         shell: bash
       - name: Install Tofu
