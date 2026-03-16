@@ -24,6 +24,9 @@ custom_sensitive_vars[msg] if {
     resource.type != "octopusdeploy_tenant_project_variable"
     resource.type != "octopusdeploy_tenant_common_variable"
 
+    # We allow the platform hub version control settings to have a username and password
+    resource.type != "octopusdeploy_platform_hub_version_control_username_password_settings"
+
     # Certificate data is always sensitive, so we don't try and validate these resources.
     resource.type != "octopusdeploy_certificate"
 
