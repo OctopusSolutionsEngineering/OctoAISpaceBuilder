@@ -84,7 +84,7 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 			return err
 		}
 
-		apply, err := handler.CreateTerraformApply(container.URI, "", test.ApiKey, model.TerraformApply{
+		apply, err, _ := handler.CreateTerraformApply(container.URI, "", test.ApiKey, model.TerraformApply{
 			ID:        "",
 			PlanId:    plan.ID,
 			Server:    "",
