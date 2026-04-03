@@ -49,6 +49,7 @@ func main() {
 	zap.L().Info("Force the redirector: " + fmt.Sprint(environment.GetRedirectionForce()))
 	zap.L().Info("Redirector bypass: " + fmt.Sprint(environment.GetRedirectionBypass()))
 	zap.L().Info("Port: " + fmt.Sprint(environment.GetPort()))
+	zap.L().Info("Persist Logs: " + fmt.Sprint(environment.GetPersistEnhancedLogs()))
 
 	/*
 		Validate that the required files are present. This is important because missing files lead to strange behaviour.

@@ -13,6 +13,10 @@ import (
 )
 
 func CreateTerraformApply(c *gin.Context) {
+	success := false
+	defer func() {
+		terraformApplyMetrics.Record(success)
+	}()
 
 	body, err := io.ReadAll(c.Request.Body)
 
@@ -56,6 +60,7 @@ func CreateTerraformApply(c *gin.Context) {
 	}
 
 	c.Header("Content-Type", "application/vnd.api+json")
+	success = true
 	c.String(http.StatusCreated, string(responseJSON))
 }
 
