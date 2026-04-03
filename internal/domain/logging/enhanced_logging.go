@@ -38,7 +38,7 @@ func LogEnhanced(log string, server string) {
 	}
 }
 
-func SaveEnhanced(content string, server string) {
+func SaveEnhanced(content string, server string, success bool) {
 	enhancedLogging := IsEnhancedLoggingEnabled(server)
 	shouldPersist := environment.GetPersistEnhancedLogs()
 
@@ -51,9 +51,11 @@ func SaveEnhanced(content string, server string) {
 		hostname = "unknown"
 	}
 
+	successLabel := lo.Ternary(success, "success", "failure")
+
 	// Format: hostname_YYYYMMDD_HHMMSS.log
 	timestamp := time.Now().Format("20060102_150405")
-	filename := fmt.Sprintf("%s_%s.log", hostname, timestamp)
+	filename := fmt.Sprintf("%s_%s_%s.log", hostname, timestamp, successLabel)
 
 	err := os.WriteFile(filename, []byte(content), 0644)
 	if err != nil {

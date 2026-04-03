@@ -34,15 +34,16 @@ func CreateTerraformPlan(c *gin.Context) {
 
 	server, token, apiKey, err := getServerTokenApiKey(c)
 
-	logging.SaveEnhanced(terraformInput.Configuration, server)
-
 	response, err := handler.CreateTerraformPlan(server, token, apiKey, terraformInput)
 
 	if err != nil {
+		logging.SaveEnhanced(terraformInput.Configuration, server, false)
 		zap.L().Error("Failed to create Terraform plan", zap.Error(err))
 		c.IndentedJSON(http.StatusInternalServerError, responses.GenerateError("Failed to process request", err))
 		return
 	}
+
+	logging.SaveEnhanced(terraformInput.Configuration, server, true)
 
 	responseJSON, err := jsonapi.Marshal(response)
 
