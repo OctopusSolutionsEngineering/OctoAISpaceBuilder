@@ -53,9 +53,8 @@ func SaveEnhanced(content string, server string, success bool) {
 
 	successLabel := lo.Ternary(success, "success", "failure")
 
-	// Format: hostname_YYYYMMDD_HHMMSS.log
 	timestamp := time.Now().Format("20060102_150405")
-	filename := fmt.Sprintf("%s_%s_%s.log", hostname, timestamp, successLabel)
+	filename := fmt.Sprintf("%s_%s_%s.tf", hostname, timestamp, successLabel)
 
 	err := os.WriteFile(filename, []byte(content), 0644)
 	if err != nil {
