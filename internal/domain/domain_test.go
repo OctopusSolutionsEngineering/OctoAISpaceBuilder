@@ -66,7 +66,7 @@ func TestPopulateSpaceWithK8sProject(t *testing.T) {
 			return err
 		}
 
-		plan, err := handler.CreateTerraformPlan(container.URI, "", test.ApiKey, model.TerraformPlan{
+		plan, err, _ := handler.CreateTerraformPlan(container.URI, "", test.ApiKey, model.TerraformPlan{
 			ID:               "",
 			PlanBinaryBase64: nil,
 			PlanText:         nil,
@@ -154,7 +154,7 @@ func TestInvalidCustomSecretsProject(t *testing.T) {
 			return err
 		}
 
-		plan, err := handler.CreateTerraformPlan(container.URI, "", test.ApiKey, model.TerraformPlan{
+		plan, err, _ := handler.CreateTerraformPlan(container.URI, "", test.ApiKey, model.TerraformPlan{
 			ID:               "",
 			PlanBinaryBase64: nil,
 			PlanText:         nil,
@@ -213,7 +213,7 @@ func TestInvalidProviderProject(t *testing.T) {
 		t.Fatalf("Failed to read terraform configuration: %v", err)
 	}
 
-	plan, err := handler.CreateTerraformPlan("http://example.org", "", test.ApiKey, model.TerraformPlan{
+	plan, err, _ := handler.CreateTerraformPlan("http://example.org", "", test.ApiKey, model.TerraformPlan{
 		ID:               "",
 		PlanBinaryBase64: nil,
 		PlanText:         nil,

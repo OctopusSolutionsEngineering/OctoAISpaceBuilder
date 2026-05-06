@@ -62,7 +62,7 @@ func SaveEnhanced(content string, server string, success bool) {
 	}
 }
 
-func SaveEnhancedApply(content string, server string, success bool) {
+func SaveEnhancedLogs(operation string, content string, server string, success bool) {
 	enhancedLogging := IsEnhancedLoggingEnabled(server)
 	shouldPersist := environment.GetPersistEnhancedLogs()
 
@@ -78,7 +78,7 @@ func SaveEnhancedApply(content string, server string, success bool) {
 	successLabel := lo.Ternary(success, "success", "failure")
 
 	timestamp := time.Now().Format("20060102_150405")
-	filename := fmt.Sprintf("apply_%s_%s_%s.log", hostname, timestamp, successLabel)
+	filename := fmt.Sprintf("%s_%s_%s_%s.log", operation, hostname, timestamp, successLabel)
 
 	err := os.WriteFile(filename, []byte(content), 0644)
 	if err != nil {

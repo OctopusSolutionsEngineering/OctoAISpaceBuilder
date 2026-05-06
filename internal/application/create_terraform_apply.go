@@ -73,7 +73,7 @@ func createTerraformApply(server, token, apiKey string, terraform model.Terrafor
 		return createTerraformApply(server, token, apiKey, terraform, retry+1)
 	}
 
-	logging.SaveEnhancedApply(output, server, err == nil)
+	logging.SaveEnhancedLogs("apply", output, server, err == nil)
 
 	return response, err
 }

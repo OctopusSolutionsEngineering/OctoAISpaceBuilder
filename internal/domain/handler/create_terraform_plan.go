@@ -22,18 +22,18 @@ import (
 	"go.uber.org/zap"
 )
 
-func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error) {
+func CreateTerraformPlan(server string, token string, apiKey string, terraformInput model.TerraformPlan) (*model.TerraformPlan, error, string) {
 
 	logging.LogEnhanced(terraformInput.Configuration, server)
 
 	if err := validation.ValidateTerraformPlanRequest(terraformInput); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	tempDir, err := files.CreateTempDir()
 
 	if err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	defer func() {
@@ -43,11 +43,11 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	}()
 
 	if err := os.WriteFile(filepath.Join(tempDir, "terraformInput.tf"), []byte(terraformInput.Configuration), 0644); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	if err := terraform.WriteOverrides(tempDir); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	var cliConfigFile = ""
@@ -55,20 +55,20 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		cliConfigFile, err = terraform.CreateTerraformRcFile()
 
 		if err != nil {
-			return nil, err
+			return nil, err, ""
 		}
 	}
 
 	lockFile, err := initTofu(cliConfigFile, tempDir)
 
 	if err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	planFile, planBinary, err := generatePlanLoop(cliConfigFile, tempDir, token, apiKey, server, terraformInput.SpaceId, 0)
 
 	if err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
 	response := model.TerraformPlan{
@@ -79,32 +79,32 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	}
 
 	if err := infrastructure.CreatePlanAzureStorageBlob(response.ID, planBinary, lockFile, []byte(terraformInput.Configuration)); err != nil {
-		return nil, err
+		return nil, err, ""
 	}
 
-	planJson, err := generatePlanJson(tempDir, planFile)
+	planJson, err, output := generatePlanJson(tempDir, planFile)
 
 	if err != nil {
-		return nil, err
+		return nil, err, output
 	}
 
 	logging.LogEnhanced(planJson, server)
 
 	if err := checkPlan(planJson, server); err != nil {
-		return nil, err
+		return nil, err, output
 	}
 
 	planText, err := generatePlanText(tempDir, planFile)
 
 	if err != nil {
-		return nil, err
+		return nil, err, output
 	}
 
 	logging.LogEnhanced(planText, server)
 
 	response.PlanText = &planText
 
-	return &response, nil
+	return &response, nil, output
 }
 
 func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
@@ -206,13 +206,13 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 	return planFile, plan, nil, stdOut + "\n" + stdErr
 }
 
-func generatePlanJson(tempDir string, planFile string) (string, error) {
+func generatePlanJson(tempDir string, planFile string) (string, error, string) {
 	zap.L().Info("Generating plan JSON")
 
 	tofu, err := environment.GetTofuExecutable()
 
 	if err != nil {
-		return "", err
+		return "", err, ""
 	}
 
 	planJsonStdOut, stdErr, _, err := execute.Execute(
@@ -230,10 +230,10 @@ func generatePlanJson(tempDir string, planFile string) (string, error) {
 
 	if err != nil {
 		zap.L().Error("Failed to generate plan json: "+stdErr+" "+planJsonStdOut, zap.Error(err))
-		return "", errors.New("Failed to generate plan json: " + stdErr + " " + planJsonStdOut + " " + err.Error())
+		return "", errors.New("Failed to generate plan json: " + stdErr + " " + planJsonStdOut + " " + err.Error()), planJsonStdOut + "\n" + stdErr
 	}
 
-	return planJsonStdOut, nil
+	return planJsonStdOut, nil, planJsonStdOut + "\n" + stdErr
 }
 
 func generatePlanText(tempDir string, planFile string) (string, error) {
