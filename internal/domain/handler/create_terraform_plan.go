@@ -65,10 +65,10 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 		return nil, err, ""
 	}
 
-	planFile, planBinary, err := generatePlanLoop(cliConfigFile, tempDir, token, apiKey, server, terraformInput.SpaceId, 0)
+	planFile, planBinary, err, logs := generatePlanLoop(cliConfigFile, tempDir, token, apiKey, server, terraformInput.SpaceId, 0)
 
 	if err != nil {
-		return nil, err, ""
+		return nil, err, logs
 	}
 
 	response := model.TerraformPlan{
@@ -79,32 +79,32 @@ func CreateTerraformPlan(server string, token string, apiKey string, terraformIn
 	}
 
 	if err := infrastructure.CreatePlanAzureStorageBlob(response.ID, planBinary, lockFile, []byte(terraformInput.Configuration)); err != nil {
-		return nil, err, ""
+		return nil, err, logs
 	}
 
-	planJson, err, output := generatePlanJson(tempDir, planFile)
+	planJson, err, _ := generatePlanJson(tempDir, planFile)
 
 	if err != nil {
-		return nil, err, output
+		return nil, err, logs
 	}
 
 	logging.LogEnhanced(planJson, server)
 
 	if err := checkPlan(planJson, server); err != nil {
-		return nil, err, output
+		return nil, err, logs
 	}
 
 	planText, err := generatePlanText(tempDir, planFile)
 
 	if err != nil {
-		return nil, err, output
+		return nil, err, logs
 	}
 
 	logging.LogEnhanced(planText, server)
 
 	response.PlanText = &planText
 
-	return &response, nil, output
+	return &response, nil, logs
 }
 
 func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
@@ -144,14 +144,14 @@ func initTofu(cliConfigFile string, tempDir string) ([]byte, error) {
 	return lockFile, nil
 }
 
-func generatePlanLoop(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string, retry int) (string, []byte, error) {
+func generatePlanLoop(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string, retry int) (string, []byte, error, string) {
 	planFile, planBinary, err, logs := generatePlan(cliConfigFile, tempDir, token, apiKey, aud, spaceId)
 
 	if err != nil && retry < 2 && IsFlakyNetworkError(logs) {
 		return generatePlanLoop(cliConfigFile, tempDir, token, apiKey, aud, spaceId, retry+1)
 	}
 
-	return planFile, planBinary, err
+	return planFile, planBinary, err, logs
 }
 
 func generatePlan(cliConfigFile string, tempDir string, token string, apiKey string, aud string, spaceId string) (string, []byte, error, string) {
