@@ -61,3 +61,27 @@ func SaveEnhanced(content string, server string, success bool) {
 		zap.L().Error("Failed to save enhanced log file", zap.String("filename", filename), zap.Error(err))
 	}
 }
+
+func SaveEnhancedApply(content string, server string, success bool) {
+	enhancedLogging := IsEnhancedLoggingEnabled(server)
+	shouldPersist := environment.GetPersistEnhancedLogs()
+
+	if !enhancedLogging || !shouldPersist {
+		return
+	}
+
+	hostname := getHostname(server)
+	if hostname == "" {
+		hostname = "unknown"
+	}
+
+	successLabel := lo.Ternary(success, "success", "failure")
+
+	timestamp := time.Now().Format("20060102_150405")
+	filename := fmt.Sprintf("apply_%s_%s_%s.log", hostname, timestamp, successLabel)
+
+	err := os.WriteFile(filename, []byte(content), 0644)
+	if err != nil {
+		zap.L().Error("Failed to save enhanced log file", zap.String("filename", filename), zap.Error(err))
+	}
+}
