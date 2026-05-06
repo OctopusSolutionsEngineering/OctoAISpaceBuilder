@@ -193,7 +193,6 @@ func generatePlan(cliConfigFile string, tempDir string, token string, apiKey str
 	logging.LogEnhanced(stdOut, aud)
 
 	if err != nil {
-		zap.L().Error("Failed to generate plan: "+stdErr+" "+stdOut, zap.Error(err))
 		return "", nil, errors.New("Failed to generate plan: " + stdErr + " " + stdOut + " " + err.Error()), stdOut + "\n" + stdErr
 	}
 
