@@ -38,7 +38,9 @@ func CreateTerraformPlan(c *gin.Context) {
 
 	server, token, apiKey, err := getServerTokenApiKey(c)
 
-	response, err, _ := handler.CreateTerraformPlan(server, token, apiKey, terraformInput)
+	response, err, output := handler.CreateTerraformPlan(server, token, apiKey, terraformInput)
+
+	logging.SaveEnhancedLogs("plan", output, server, err == nil)
 
 	if err != nil {
 		logging.SaveEnhanced(terraformInput.Configuration, server, false)
