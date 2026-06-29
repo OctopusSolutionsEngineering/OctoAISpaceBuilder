@@ -58,5 +58,5 @@ func TestGetDisableTerraformCliConfig(t *testing.T) {
 }
 
 func TestGetTerraformProviderVersion(t *testing.T) {
-	assert.Equal(t, "1.16.0", GetTerraformProviderVersion())
+	assert.Equal(t, "1.17.0", GetTerraformProviderVersion())
 }

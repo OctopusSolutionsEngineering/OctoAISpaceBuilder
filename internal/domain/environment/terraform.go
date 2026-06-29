@@ -13,7 +13,7 @@ This version must be updated:
 * In the Dockerfile
 * In the functions/provider/registry.opentofu.org/octopusdeploy/octopusdeploy directory
 */
-const terraformProviderVersion = "1.16.0"
+const terraformProviderVersion = "1.17.0"
 
 func GetDisableTerraformCliConfig() bool {
 	// Check if the environment variable is set to "true"
