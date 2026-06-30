@@ -363,54 +363,6 @@ resource "octopusdeploy_process_step" "process_step_get_mysql_host" {
   }
 }
 
-resource "octopusdeploy_deployment_process" "deployment_process_my_k8s_project_2" {
-  project_id = octopusdeploy_project.project_my_k8s_project_2[0].id
-
-  step {
-    condition           = "Success"
-    name                = "Deploy a Kubernetes Web App via YAML"
-    package_requirement = "LetOctopusDecide"
-    start_trigger       = "StartAfterPrevious"
-
-    action {
-      action_type                        = "Octopus.KubernetesDeployRawYaml"
-      name                               = "Deploy a Kubernetes Web App via YAML"
-      condition                          = "Success"
-      run_on_server                      = true
-      is_disabled                        = false
-      can_be_used_for_project_versioning = true
-      is_required                        = false
-      worker_pool_id                     = data.octopusdeploy_worker_pools.workerpool_default_worker_pool.worker_pools[0].id
-      properties                         = {
-        "Octopus.Action.Kubernetes.ResourceStatusCheck" = "True"
-        "Octopus.Action.Script.ScriptSource" = "Inline"
-        "Octopus.Action.KubernetesContainers.Namespace" = "#{Octopus.Environment.Name | ToLower}"
-        "Octopus.Action.Kubernetes.DeploymentTimeout" = "180"
-        "Octopus.Action.Kubernetes.ServerSideApply.ForceConflicts" = "True"
-        "Octopus.Action.RunOnServer" = "true"
-        "Octopus.Action.Kubernetes.ServerSideApply.Enabled" = "True"
-        "Octopus.Action.KubernetesContainers.CustomResourceYaml" = "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: octopub\n  labels:\n    app: octopub\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: octopub\n  template:\n    metadata:\n      labels:\n        app: octopub\n    spec:\n      containers:\n      - name: octopub\n        image: octopussamples/octopub-selfcontained\n        ports:\n        - containerPort: 8080\n        resources:\n          limits:\n            cpu: \"1\"\n            memory: \"512Mi\"\n          requests:\n            cpu: \"0.5\"\n            memory: \"256Mi\"\n        livenessProbe:\n          httpGet:\n            path: /health/products\n            port: 8080\n          initialDelaySeconds: 30\n          periodSeconds: 10\n        readinessProbe:\n          httpGet:\n            path: /health/products\n            port: 8080\n          initialDelaySeconds: 5\n          periodSeconds: 5\n"
-        "OctopusUseBundledTooling" = "False"
-      }
-
-      container {
-        feed_id = octopusdeploy_docker_container_registry.feed_github_container_registry.id
-        image   = "ghcr.io/octopusdeploylabs/k8s-workertools"
-      }
-
-      environments          = []
-      excluded_environments = [octopusdeploy_environment.environment_development__security_.id]
-      channels              = []
-      tenant_tags           = []
-      features              = []
-    }
-
-    properties   = {}
-    target_roles = ["Kubernetes"]
-  }
-  depends_on = []
-}
-
 variable "variable_42a2de0c9187a3d773ca5ee10a26490b4e720a0edd470e2907fbe2a77f633531_sensitive_value" {
   type        = string
   nullable    = true
