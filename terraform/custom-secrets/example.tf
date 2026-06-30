@@ -331,7 +331,7 @@ data "octopusdeploy_worker_pools" "workerpool_default_worker_pool" {
 }
 
 resource "octopusdeploy_process" "test" {
-  project_id = octopusdeploy_project.project_my_k8s_project_2[0].id
+  project_id = octopusdeploy_project.project_my_k8s_project_2.id
   depends_on = []
 }
 
