@@ -5,7 +5,7 @@ provider "octopusdeploy" {
 terraform {
 
   required_providers {
-    octopusdeploy = { source = "OctopusDeploy/octopusdeploy", version = "1.0.1" }
+    octopusdeploy = { source = "OctopusDeploy/octopusdeploy", version = "1.17.0" }
   }
   required_version = ">= 1.6.0"
 }
@@ -23,6 +23,7 @@ data "octopusdeploy_project_groups" "project_group_kubernetes" {
   skip         = 0
   take         = 1
 }
+
 variable "project_group_kubernetes_name" {
   type        = string
   nullable    = false
@@ -30,8 +31,8 @@ variable "project_group_kubernetes_name" {
   description = "The name of the project group to lookup"
   default     = "Kubernetes"
 }
+
 resource "octopusdeploy_project_group" "project_group_kubernetes" {
-  count = "${length(data.octopusdeploy_project_groups.project_group_kubernetes.project_groups) != 0 ? 0 : 1}"
   name  = "${var.project_group_kubernetes_name}"
   lifecycle {
     prevent_destroy = true
@@ -44,8 +45,8 @@ data "octopusdeploy_environments" "environment_dev" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_environment" "environment_dev" {
-  count                        = "${length(data.octopusdeploy_environments.environment_dev.environments) != 0 ? 0 : 1}"
   name                         = "Dev"
   description                  = ""
   allow_dynamic_infrastructure = true
@@ -73,8 +74,8 @@ data "octopusdeploy_environments" "environment_development__security_" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_environment" "environment_development__security_" {
-  count                        = "${length(data.octopusdeploy_environments.environment_development__security_.environments) != 0 ? 0 : 1}"
   name                         = "Development (Security)"
   description                  = "Used to scan the development releases for security issues. This resource is created and managed by the [Octopus Terraform provider](https://registry.terraform.io/providers/OctopusDeploy/octopusdeploy/latest/docs). The Terraform files can be found in the [GitHub repo](https://github.com/mcasperson/AppBuilder-EKS)."
   allow_dynamic_infrastructure = true
@@ -102,8 +103,8 @@ data "octopusdeploy_environments" "environment_production__app_" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_environment" "environment_production__app_" {
-  count                        = "${length(data.octopusdeploy_environments.environment_production__app_.environments) != 0 ? 0 : 1}"
   name                         = "Production (App)"
   description                  = "The production environment."
   allow_dynamic_infrastructure = true
@@ -131,8 +132,8 @@ data "octopusdeploy_environments" "environment_production__security_" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_environment" "environment_production__security_" {
-  count                        = "${length(data.octopusdeploy_environments.environment_production__security_.environments) != 0 ? 0 : 1}"
   name                         = "Production (Security)"
   description                  = "Used to scan the productions releases for security issues. This resource is created and managed by the [Octopus Terraform provider](https://registry.terraform.io/providers/OctopusDeploy/octopusdeploy/latest/docs). The Terraform files can be found in the [GitHub repo](https://github.com/mcasperson/AppBuilder-EKS)."
   allow_dynamic_infrastructure = true
@@ -160,34 +161,34 @@ data "octopusdeploy_lifecycles" "lifecycle_application_and_security" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_lifecycle" "lifecycle_application_and_security" {
-  count       = "${length(data.octopusdeploy_lifecycles.lifecycle_application_and_security.lifecycles) != 0 ? 0 : 1}"
   name        = "Application and Security"
   description = ""
 
   phase {
     automatic_deployment_targets          = []
-    optional_deployment_targets           = ["${length(data.octopusdeploy_environments.environment_dev.environments) != 0 ? data.octopusdeploy_environments.environment_dev.environments[0].id : octopusdeploy_environment.environment_dev[0].id}"]
+    optional_deployment_targets           = [octopusdeploy_environment.environment_dev.id]
     name                                  = "Development"
     is_optional_phase                     = false
     minimum_environments_before_promotion = 0
   }
   phase {
-    automatic_deployment_targets          = ["${length(data.octopusdeploy_environments.environment_development__security_.environments) != 0 ? data.octopusdeploy_environments.environment_development__security_.environments[0].id : octopusdeploy_environment.environment_development__security_[0].id}"]
+    automatic_deployment_targets          = [octopusdeploy_environment.environment_development__security_.id]
     optional_deployment_targets           = []
-    name                                  = "Dveelopment Security"
+    name                                  = "Development Security"
     is_optional_phase                     = false
     minimum_environments_before_promotion = 0
   }
   phase {
     automatic_deployment_targets          = []
-    optional_deployment_targets           = ["${length(data.octopusdeploy_environments.environment_production__app_.environments) != 0 ? data.octopusdeploy_environments.environment_production__app_.environments[0].id : octopusdeploy_environment.environment_production__app_[0].id}"]
+    optional_deployment_targets           = [octopusdeploy_environment.environment_production__app_.id]
     name                                  = "Production"
     is_optional_phase                     = false
     minimum_environments_before_promotion = 0
   }
   phase {
-    automatic_deployment_targets          = ["${length(data.octopusdeploy_environments.environment_production__security_.environments) != 0 ? data.octopusdeploy_environments.environment_production__security_.environments[0].id : octopusdeploy_environment.environment_production__security_[0].id}"]
+    automatic_deployment_targets          = [octopusdeploy_environment.environment_production__security_.id]
     optional_deployment_targets           = []
     name                                  = "Production Security"
     is_optional_phase                     = false
@@ -218,7 +219,6 @@ data "octopusdeploy_environments" "environment_test" {
   take         = 1
 }
 resource "octopusdeploy_environment" "environment_test" {
-  count                        = "${length(data.octopusdeploy_environments.environment_test.environments) != 0 ? 0 : 1}"
   name                         = "Test"
   description                  = ""
   allow_dynamic_infrastructure = true
@@ -246,8 +246,8 @@ data "octopusdeploy_environments" "environment_production" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_environment" "environment_production" {
-  count                        = "${length(data.octopusdeploy_environments.environment_production.environments) != 0 ? 0 : 1}"
   name                         = "Production"
   description                  = ""
   allow_dynamic_infrastructure = true
@@ -310,8 +310,8 @@ data "octopusdeploy_feeds" "feed_github_container_registry" {
   skip         = 0
   take         = 1
 }
+
 resource "octopusdeploy_docker_container_registry" "feed_github_container_registry" {
-  count                                = "${length(data.octopusdeploy_feeds.feed_github_container_registry.feeds) != 0 ? 0 : 1}"
   name                                 = "GitHub Container Registry"
   registry_path                        = ""
   api_version                          = "v2"
@@ -329,32 +329,42 @@ data "octopusdeploy_worker_pools" "workerpool_default_worker_pool" {
   skip         = 0
   take         = 1
 }
-resource "octopusdeploy_dynamic_worker_pool" "workerpool_default_worker_pool" {
-  count       = "${length(data.octopusdeploy_worker_pools.workerpool_default_worker_pool.worker_pools) != 0 ? 0 : 1}"
-  name        = "Default Worker Pool"
-  description = "Default pool of workers from the Dynamic Worker service"
-  is_default  = false
-  worker_type = "WindowsDefault"
-  lifecycle {
-    prevent_destroy = true
-  }
+
+resource "octopusdeploy_process" "test" {
+  project_id = octopusdeploy_project.project_my_k8s_project_2[0].id
+  depends_on = []
 }
 
-data "octopusdeploy_worker_pools" "workerpool_hosted_ubuntu" {
-  ids          = null
-  partial_name = "Hosted Ubuntu"
-  skip         = 0
-  take         = 1
-  lifecycle {
-    postcondition {
-      error_message = "Failed to resolve a worker pool called \"Hosted Ubuntu\". This resource must exist in the space before this Terraform configuration is applied."
-      condition     = length(self.worker_pools) != 0
-    }
+resource "octopusdeploy_process_steps_order" "test" {
+  process_id = "${octopusdeploy_process.test.id}"
+  steps      = ["${octopusdeploy_process_step.process_step_get_mysql_host.id}"]
+}
+
+resource "octopusdeploy_process_step" "process_step_get_mysql_host" {
+  name                  = "Get MySQL Host"
+  type                  = "Octopus.KubernetesRunScript"
+  process_id            = "${octopusdeploy_process.test.id}"
+  channels              = null
+  condition             = "Success"
+  environments          = null
+  excluded_environments = null
+  package_requirement   = "LetOctopusDecide"
+  slug                  = "get-mysql-host"
+  start_trigger         = "StartAfterPrevious"
+  tenant_tags           = null
+  execution_properties  = {
+    "Octopus.Action.Script.Syntax" = "PowerShell"
+    "Octopus.Action.Script.ScriptBody" = "echo \"hi\""
+    "Octopus.Action.RunOnServer" = "true"
+    "Octopus.Action.Script.ScriptSource" = "Inline"
+  }
+  properties            = {
+    "Octopus.Action.TargetRoles" = "eks"
   }
 }
 
 resource "octopusdeploy_deployment_process" "deployment_process_my_k8s_project_2" {
-  project_id = "${length(data.octopusdeploy_projects.project_my_k8s_project_2.projects) != 0 ? data.octopusdeploy_projects.project_my_k8s_project_2.projects[0].id : octopusdeploy_project.project_my_k8s_project_2[0].id}"
+  project_id = octopusdeploy_project.project_my_k8s_project_2[0].id
 
   step {
     condition           = "Success"
@@ -370,7 +380,7 @@ resource "octopusdeploy_deployment_process" "deployment_process_my_k8s_project_2
       is_disabled                        = false
       can_be_used_for_project_versioning = true
       is_required                        = false
-      worker_pool_id                     = "${data.octopusdeploy_worker_pools.workerpool_hosted_ubuntu.worker_pools[0].id}"
+      worker_pool_id                     = data.octopusdeploy_worker_pools.workerpool_default_worker_pool.worker_pools[0].id
       properties                         = {
         "Octopus.Action.Kubernetes.ResourceStatusCheck" = "True"
         "Octopus.Action.Script.ScriptSource" = "Inline"
@@ -384,12 +394,12 @@ resource "octopusdeploy_deployment_process" "deployment_process_my_k8s_project_2
       }
 
       container {
-        feed_id = "${length(data.octopusdeploy_feeds.feed_github_container_registry.feeds) != 0 ? data.octopusdeploy_feeds.feed_github_container_registry.feeds[0].id : octopusdeploy_docker_container_registry.feed_github_container_registry[0].id}"
+        feed_id = octopusdeploy_docker_container_registry.feed_github_container_registry.id
         image   = "ghcr.io/octopusdeploylabs/k8s-workertools"
       }
 
       environments          = []
-      excluded_environments = ["${length(data.octopusdeploy_environments.environment_development__security_.environments) != 0 ? data.octopusdeploy_environments.environment_development__security_.environments[0].id : octopusdeploy_environment.environment_development__security_[0].id}"]
+      excluded_environments = [octopusdeploy_environment.environment_development__security_.id]
       channels              = []
       tenant_tags           = []
       features              = []
@@ -409,8 +419,7 @@ variable "variable_42a2de0c9187a3d773ca5ee10a26490b4e720a0edd470e2907fbe2a77f633
   default     = "A custom secret value"
 }
 resource "octopusdeploy_variable" "my_k8s_project_2_secretvariable_1" {
-  count           = "${length(data.octopusdeploy_projects.project_my_k8s_project_2.projects) != 0 ? 0 : 1}"
-  owner_id        = "${length(data.octopusdeploy_projects.project_my_k8s_project_2.projects) == 0 ?octopusdeploy_project.project_my_k8s_project_2[0].id : data.octopusdeploy_projects.project_my_k8s_project_2.projects[0].id}"
+  owner_id        = octopusdeploy_project.project_my_k8s_project_2.id
   name            = "SecretVariable"
   type            = "Sensitive"
   is_sensitive    = true
@@ -464,7 +473,6 @@ data "octopusdeploy_projects" "project_my_k8s_project_2" {
   take         = 1
 }
 resource "octopusdeploy_project" "project_my_k8s_project_2" {
-  count                                = "${length(data.octopusdeploy_projects.project_my_k8s_project_2.projects) != 0 ? 0 : 1}"
   name                                 = "${var.project_my_k8s_project_2_name}"
   auto_create_release                  = false
   default_guided_failure_mode          = "EnvironmentDefault"
@@ -472,8 +480,8 @@ resource "octopusdeploy_project" "project_my_k8s_project_2" {
   discrete_channel_release             = false
   is_disabled                          = false
   is_version_controlled                = false
-  lifecycle_id                         = "${length(data.octopusdeploy_lifecycles.lifecycle_application_and_security.lifecycles) != 0 ? data.octopusdeploy_lifecycles.lifecycle_application_and_security.lifecycles[0].id : octopusdeploy_lifecycle.lifecycle_application_and_security[0].id}"
-  project_group_id                     = "${length(data.octopusdeploy_project_groups.project_group_kubernetes.project_groups) != 0 ? data.octopusdeploy_project_groups.project_group_kubernetes.project_groups[0].id : octopusdeploy_project_group.project_group_kubernetes[0].id}"
+  lifecycle_id                         = octopusdeploy_lifecycle.lifecycle_application_and_security.id
+  project_group_id                     = octopusdeploy_project_group.project_group_kubernetes.id
   included_library_variable_sets       = []
   tenanted_deployment_participation    = "${var.project_my_k8s_project_2_tenanted}"
 
