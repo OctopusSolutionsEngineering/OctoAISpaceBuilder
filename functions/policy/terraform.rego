@@ -27,6 +27,9 @@ custom_sensitive_vars[msg] if {
     # We allow the platform hub version control settings to have a username and password
     resource.type != "octopusdeploy_platform_hub_version_control_username_password_settings"
 
+    # Git credentials can also have real credentials
+    resource.type != "octopusdeploy_git_credential"
+
     # Certificate data is always sensitive, so we don't try and validate these resources.
     resource.type != "octopusdeploy_certificate"
 
