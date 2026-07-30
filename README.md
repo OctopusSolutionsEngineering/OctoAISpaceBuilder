@@ -35,7 +35,16 @@ This branch is pulled and built by the workflow.
 Start the Azurite emulator with the following command:
 
 ```bash
-docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite --skipApiVersionCheck
+```
+
+This is the command in MacOs:
+
+```bash
+docker run -d --name azurite -p 10000:10000 -p 10001:10001 -p 10002:10002 \
+  --restart unless-stopped \
+  mcr.microsoft.com/azure-storage/azurite \
+  azurite --skipApiVersionCheck --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
 ```
 
 Set the `AzureWebJobsStorage` environment variable to:
