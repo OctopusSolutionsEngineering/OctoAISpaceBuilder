@@ -92,8 +92,8 @@ jobs:
           gotestsum --junitfile results.xml -- -v -coverprofile=coverage.out -coverpkg=github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/... -timeout 0 -json ./...
           EXITCODE=$?
           echo "Exit code is $EXITCODE"
-#          go tool cover -html=coverage.out -o=coverage.html
-#          go tool cover -func=coverage.out -o=coverage.out
+          # go tool cover -html=coverage.out -o=coverage.html
+          # go tool cover -func=coverage.out -o=coverage.out
           exit $EXITCODE
         shell: bash
         env:
