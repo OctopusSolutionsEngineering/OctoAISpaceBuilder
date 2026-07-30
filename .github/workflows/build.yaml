@@ -89,6 +89,7 @@ jobs:
         run: sudo apt-get install -y gotestsum
       - name: Test
         run: |-
+          set +e
           gotestsum --junitfile results.xml -- -v -coverprofile=coverage.out -coverpkg=github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/... -timeout 0 -json ./...
           EXITCODE=$?
           echo "Exit code is $EXITCODE"
