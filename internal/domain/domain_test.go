@@ -13,7 +13,7 @@ import (
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/handler"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/logging"
 	"github.com/OctopusSolutionsEngineering/OctoAISpaceBuilder/internal/domain/model"
-	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/test"
+	"github.com/OctopusSolutionsEngineering/OctopusTerraformTestFramework/v2/test"
 )
 
 // TestPopulateSpaceWithK8sProject creates a space and populates it via the domain level handlers.
